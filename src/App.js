@@ -12,7 +12,7 @@ function App() {
       <AppBar position="static" color="secondary">
         <Toolbar>
           <img src="munilogo.png" width="76px"></img>
-          <Typography variant="h6" style={{cursor:"default"}}>
+          <Typography variant="h5" style={{cursor:"default"}}>
             Complejo de piletas
           </Typography>
         </Toolbar>
@@ -26,7 +26,7 @@ function App() {
           <Toolbar>
             <Grid container direction="row" alignItems="center" justify="center">
               <Grid item xs={2} sm={2} md={2} lg={2} align="right">
-                <img src="logo192.png" width="50px"></img>
+                <img src="munilogo.png" width="50px"></img>
               </Grid>
               <Grid item xs={10} sm={6} md={6} lg={6} align="left">
                   <Typography variant="h6">
@@ -37,7 +37,7 @@ function App() {
                   <Typography>
                     Ante problemas contactar a:
                   </Typography>
-                  <a href="#" target="_blank" className={classes.EstiloLink}>a@a.a</a>
+                  <a href="#" target="_blank" className={classes.EstiloLink}>mainardcin@gmail.com</a>
               </Grid>
             </Grid>
           </Toolbar>

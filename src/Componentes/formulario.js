@@ -330,64 +330,63 @@ const Formulario = ({setsiguiente, ruta}) =>{
                                 required/>
                             </Grid>
 
-                            <Hidden lgDown={tildado}>
-                                <Grid item lg={3} md={3} sm={12} xs={12}>
-                                    <TextField
-                                    onChange={modificarInput}
-                                    value={persona.nombre}
-                                    name="nombre"
-                                    className={classes.inputAncho}
-                                    id="filled-basic"
-                                    label="Nombre"
-                                    variant="filled"
-                                    maxLength={50}
-                                    required/>
-                                </Grid>
+                            
+                            {!tildado && <Grid item lg={3} md={3} sm={12} xs={12}>
+                                <TextField
+                                onChange={modificarInput}
+                                value={persona.nombre}
+                                name="nombre"
+                                className={classes.inputAncho}
+                                id="filled-basic"
+                                label="Nombre"
+                                variant="filled"
+                                maxLength={50}
+                                required/>
+                            </Grid>}
 
-                                <Grid item lg={3} md={3} sm={12} xs={12}>
-                                    <TextField
-                                    onChange={modificarInput}
-                                    value={persona.apellido}
-                                    name="apellido"
-                                    className={classes.inputAncho}
-                                    id="filled-basic"
-                                    label="Apellido"
-                                    variant="filled"
-                                    maxLength={50}
-                                    required/>
-                                </Grid>
+                            {!tildado && <Grid item lg={3} md={3} sm={12} xs={12}>
+                                <TextField
+                                onChange={modificarInput}
+                                value={persona.apellido}
+                                name="apellido"
+                                className={classes.inputAncho}
+                                id="filled-basic"
+                                label="Apellido"
+                                variant="filled"
+                                maxLength={50}
+                                required/>
+                            </Grid>}
                                 
-                                <Grid item lg={2} md={2} sm={12} xs={12}>
-                                    <TextField
-                                        onChange={modificarInput}
-                                        value={persona.telefono}
-                                        name="telefono"
-                                        className={classes.inputAncho}
-                                        id="filled-basic"
-                                        label="Número de celular"
-                                        variant="filled"
-                                        maxLength={50}
-                                    />
-                                </Grid>
+                            {!tildado && <Grid item lg={2} md={2} sm={12} xs={12}>
+                                <TextField
+                                    onChange={modificarInput}
+                                    value={persona.telefono}
+                                    name="telefono"
+                                    className={classes.inputAncho}
+                                    id="filled-basic"
+                                    label="Número de celular"
+                                    variant="filled"
+                                    maxLength={50}
+                                />
+                            </Grid>}
 
-                                <Grid item lg={2} md={2} sm={12} xs={12}>
-                                    <FormControl className={classes.inputAncho}>
-                                        <InputLabel id="demo-simple-select-label" style={{margin:"7px 10px"}}>Domicilio</InputLabel>
-                                        <Select
-                                            value={persona.domicilio}
-                                            name="domicilio"
-                                            onChange={modificarInput}
-                                            
-                                            id="domicilio"
-                                            variant="filled"
-                                            required
-                                        >
-                                            <MenuItem value="San Bernardo">San Bernardo</MenuItem>
-                                            <MenuItem value="Soy turista">Soy turista</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Hidden>
+                            {!tildado && <Grid item lg={2} md={2} sm={12} xs={12}>
+                                <FormControl className={classes.inputAncho}>
+                                    <InputLabel id="demo-simple-select-label" style={{margin:"7px 10px"}}>Domicilio</InputLabel>
+                                    <Select
+                                        value={persona.domicilio}
+                                        name="domicilio"
+                                        onChange={modificarInput}
+                                        
+                                        id="domicilio"
+                                        variant="filled"
+                                        required
+                                    >
+                                        <MenuItem value="San Bernardo">San Bernardo</MenuItem>
+                                        <MenuItem value="Soy turista">Soy turista</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>}
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
                                 <input
