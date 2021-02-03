@@ -6,10 +6,10 @@ import Alert from '@material-ui/lab/Alert';
 import Estilos from '../Estilos.js';
 
 //Componente utilizado para crear o modificar publicaciones o solicitudes de servicios
-export default function Inicio() {
+export default function Inicio({ruta}) {
     const [siguiente, setsiguiente] = useState(false);
     return ( 
-        siguiente?<Formulario setsiguiente={setsiguiente}/>:<Condiciones setsiguiente={setsiguiente}/>
+        siguiente?<Formulario setsiguiente={setsiguiente} ruta={ruta}/>:<Condiciones setsiguiente={setsiguiente}/>
     );
 }
 
@@ -91,7 +91,7 @@ function Alerta({funcionAceptar, persona, turno}) {
     );
   }
 
-const Formulario = ({setsiguiente}) =>{
+const Formulario = ({setsiguiente, ruta}) =>{
     const classes = Estilos();
     const [cargando, setcargando] = useState(false);
     const [abrirConfirmacion, setabrirConfirmacion] = useState(false);
@@ -135,7 +135,7 @@ const Formulario = ({setsiguiente}) =>{
         })
 
         setesperaDisponible(true)
-        axios.get('http://localhost:1337/turnos/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
+        axios.get(ruta+'/turnos/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
         .then(response => {
             console.log(response.data);
             setdisponibles(100-response.data)
@@ -187,7 +187,7 @@ const Formulario = ({setsiguiente}) =>{
 
     function alertaPregunta(e){
         e.preventDefault();
-        axios.get('http://localhost:1337/personas?dni='+persona.dni)
+        axios.get(ruta+'/personas?dni='+persona.dni)
         .then(response => {
             if(response.data.length === 0 || tildado===true){
                 if (tildado && response.data.length !== 0)
@@ -218,17 +218,17 @@ const Formulario = ({setsiguiente}) =>{
             persona_aux.permitido = aux;
 
             
-            axios.get('http://localhost:1337/personas?dni='+persona.dni)
+            axios.get(ruta+'/personas?dni='+persona.dni)
             .then(response => {
                 if(response.data.length === 0){
-                    axios.post('http://localhost:1337/personas', persona_aux)
+                    axios.post(ruta+'/personas', persona_aux)
                     .then(response => {
                         console.log(response.data);
 
                         let turno_aux = turno;
                         turno_aux.persona = response.data.id;
                         
-                        axios.post('http://localhost:1337/turnos', turno_aux)
+                        axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
                             console.log("Turno realizado correctamente")
                             limpiarVariables()
@@ -255,7 +255,7 @@ const Formulario = ({setsiguiente}) =>{
                             //Debe esperar XXXXXX tiempo antes de poder volver a realizar una reserva
                         }
                     }else{
-                        axios.post('http://localhost:1337/turnos', turno_aux)
+                        axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
                             console.log("Turno realizado correctamente")
                             limpiarVariables()
@@ -274,7 +274,7 @@ const Formulario = ({setsiguiente}) =>{
     function seleccionarFecha(e){
         setturno({...turno, fecha: e.target.value})
         setesperaDisponible(true)
-        axios.get('http://localhost:1337/turnos/count?fecha='+e.target.value)
+        axios.get(ruta+'/turnos/count?fecha='+e.target.value)
         .then(response => {
             console.log(response.data);
             setdisponibles(100-response.data)

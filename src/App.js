@@ -6,6 +6,7 @@ import Listado from './Componentes/listado'
 import Estilos from './Estilos'
 function App() {
   const classes = Estilos();
+  const ruta = "https://piletas-sb.herokuapp.com";
   return (
     <div className="App" style={{height: "auto"}}>
       <AppBar position="static" color="secondary">
@@ -18,7 +19,7 @@ function App() {
       </AppBar>
 
       <div className="Inicio">
-        <Formulario/>
+        <Formulario ruta={ruta}/>
       </div>
 
       <AppBar  color="secondary" position="relative" bottom="0px" style={{zIndex: 0}}>   
