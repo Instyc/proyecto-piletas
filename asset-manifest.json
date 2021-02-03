@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/proyecto-piletas/static/css/main.200f2628.chunk.css",
-    "main.js": "/proyecto-piletas/static/js/main.dce90bba.chunk.js",
-    "main.js.map": "/proyecto-piletas/static/js/main.dce90bba.chunk.js.map",
+    "main.js": "/proyecto-piletas/static/js/main.bafa0fdc.chunk.js",
+    "main.js.map": "/proyecto-piletas/static/js/main.bafa0fdc.chunk.js.map",
     "runtime-main.js": "/proyecto-piletas/static/js/runtime-main.f9da2da3.js",
     "runtime-main.js.map": "/proyecto-piletas/static/js/runtime-main.f9da2da3.js.map",
     "static/js/2.bfda3e5e.chunk.js": "/proyecto-piletas/static/js/2.bfda3e5e.chunk.js",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.f9da2da3.js",
     "static/js/2.bfda3e5e.chunk.js",
     "static/css/main.200f2628.chunk.css",
-    "static/js/main.dce90bba.chunk.js"
+    "static/js/main.bafa0fdc.chunk.js"
   ]
 }
