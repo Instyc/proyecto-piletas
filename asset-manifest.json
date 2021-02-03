@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/proyecto-piletas/static/css/main.200f2628.chunk.css",
+    "main.js": "/proyecto-piletas/static/js/main.aea6802e.chunk.js",
+    "main.js.map": "/proyecto-piletas/static/js/main.aea6802e.chunk.js.map",
+    "runtime-main.js": "/proyecto-piletas/static/js/runtime-main.991a5b75.js",
+    "runtime-main.js.map": "/proyecto-piletas/static/js/runtime-main.991a5b75.js.map",
+    "static/js/2.89825aee.chunk.js": "/proyecto-piletas/static/js/2.89825aee.chunk.js",
+    "static/js/2.89825aee.chunk.js.map": "/proyecto-piletas/static/js/2.89825aee.chunk.js.map",
+    "static/js/3.6a6ab035.chunk.js": "/proyecto-piletas/static/js/3.6a6ab035.chunk.js",
+    "static/js/3.6a6ab035.chunk.js.map": "/proyecto-piletas/static/js/3.6a6ab035.chunk.js.map",
+    "index.html": "/proyecto-piletas/index.html",
+    "static/css/main.200f2628.chunk.css.map": "/proyecto-piletas/static/css/main.200f2628.chunk.css.map",
+    "static/js/2.89825aee.chunk.js.LICENSE.txt": "/proyecto-piletas/static/js/2.89825aee.chunk.js.LICENSE.txt",
+    "static/media/logo.6ce24c58.svg": "/proyecto-piletas/static/media/logo.6ce24c58.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.991a5b75.js",
+    "static/js/2.89825aee.chunk.js",
+    "static/css/main.200f2628.chunk.css",
+    "static/js/main.aea6802e.chunk.js"
+  ]
+}
