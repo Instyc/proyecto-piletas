@@ -1,18 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React,{useState, useEffect} from 'react';
+import axios from 'axios';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import {Box, Collapse, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Typography, Paper, Grid } from '@material-ui/core';
+import Cargando from '@material-ui/core/LinearProgress';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Estilos from '../Estilos.js';
@@ -42,53 +32,64 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      { date: '2020-01-05', customerId: '11091700', amount: 3 },
-      { date: '2020-01-02', customerId: 'Anonymous', amount: 1 },
-    ],
-  };
-}
-
-function Row(props) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
+function Row({turno, ruta, usuario}) {
+  const [open, setOpen] = useState(false);
   const classes = useRowStyles();
+  const [Turno, setTurno] = useState(turno);
+
+  let auth = 'Bearer '+usuario.jwt;
+
+  function asignarAsistencia(){
+    let asis = !Turno.asistencia;
+    axios.put(ruta+'/turnos/'+Turno.id,{
+      asistencia: asis
+    },{headers: {'Authorization': auth}})
+    .then(response => {
+      console.log(response.data)
+      setTurno({
+        ...Turno,
+        asistencia: !Turno.asistencia
+      })
+    }).catch(error => {
+      console.log(error.response)
+    });
+  }
 
   return (
     <React.Fragment>
-      <StyledTableRow className={classes.root} onClick={() => setOpen(!open)}>
-        <StyledTableCell align="left" component="th" scope="row">
+      <StyledTableRow className={classes.root}>
+        <StyledTableCell align="left" component="th" scope="row" onClick={() => setOpen(!open)}>
           <IconButton aria-label="expand row" size="small" >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-          {row.name}
+          {`${Turno.persona.apellido} ${Turno.persona.nombre}`}
         </StyledTableCell>
-        <StyledTableCell align="center">{row.calories}</StyledTableCell>
+        <StyledTableCell align="center">{Turno.persona.dni}</StyledTableCell>
         <StyledTableCell align="center">
-          <Button size="small" variant="contained" color="secondary">NO</Button>
+          <Button size="small" variant="contained" color={Turno.asistencia?"primary":"secondary"} onClick={asignarAsistencia}>{Turno.asistencia?"SI":"NO"}</Button>
         </StyledTableCell>
       </StyledTableRow>
       <StyledTableRow>
         <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
-              <Typography variant="h6" gutterBottom component="div">
-                Número de celular: 36655565
-              </Typography>
-              <Typography variant="h6" gutterBottom component="div">
-                Localidad: Samber
-              </Typography>
-              <Typography variant="h6" gutterBottom component="div">
-                Área reservada: Ambos
-              </Typography>
+              <Grid container>
+                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                  <Typography variant="h6" gutterBottom component="div">
+                    Teléfono: {Turno.persona.telefono!==""?Turno.persona.telefono:"N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                  <Typography variant="h6" gutterBottom component="div">
+                    {Turno.persona.domicilio?" Localidad: San Bernardo":" Situación: Turista"}
+                  </Typography>
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                  <Typography variant="h6" gutterBottom component="div">
+                    Área: {Turno.persona.area===0?"Pileta":Turno.persona.area===1?"Camping":"Pileta y camping"}
+                  </Typography>
+                </Grid>
+              </Grid>
             </Box>
           </Collapse>
         </StyledTableCell>
@@ -97,151 +98,96 @@ function Row(props) {
   );
 }
 
-Row.propTypes = {
-  row: PropTypes.shape({
-    calories: PropTypes.number.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
-  }).isRequired,
-};
 
-const rows = [
-  createData('Frozen yoghurt', 42171487, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
-
-export default function CollapsibleTable() {
+export default function Listado({ruta,usuario}) {
   const classes = Estilos();
+  const [fechaHoy, setfechaHoy] = useState("");
+  const [mensaje, setmensaje] = useState("");
+  const [esperaDisponible, setesperaDisponible] = useState(false);
+  const [turnos, setturnos] = useState([]);
+
+  useEffect(()=>{
+    let date_ = new Date();
+    let mes = date_.getMonth() + 1
+    if(mes < 10)
+        mes = "0"+mes
+    let dia = date_.getDay()
+    if(dia < 10)
+        dia = "0"+dia
+    
+    setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+
+    setesperaDisponible(true)
+    axios.get(ruta+'/turnos?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
+    .then(response => {
+        setturnos(response.data)
+        setesperaDisponible(false)
+    }).catch(error => {
+        console.log(error.response)
+    });
+  },[])
+
+  function seleccionarFecha(e){
+    setesperaDisponible(true)
+    setfechaHoy(e.target.value)
+    if (mensaje!=="")
+      setmensaje("")
+    let _fecha = new Date(e.target.value)
+    if (_fecha.getUTCDay()!==1){
+        axios.get(ruta+'/turnos?fecha='+e.target.value)
+        .then(response => {
+            console.log(response.data);
+            setturnos([])
+            setturnos(response.data)
+            if (response.data.length===0)
+              setmensaje("No existen reservas para el día seleccionado.")
+            setesperaDisponible(false)
+        }).catch(error => {
+            console.log(error.response)
+        });
+    }else{
+        setturnos([])
+        setmensaje("Los días lunes no se pueden realizar reservas.")
+        setesperaDisponible(false)
+    }
+  }
+
   return (
-    <div style={{margin:"10px"}}>
-      <Paper elevation={3} style={{maxWidth:"1000px",margin:"auto",padding: "20px", background:"LightSkyBlue"}} className="Fondo">
+    <div className={classes.fondo2} style={{margin:"auto"}}>
+      <Paper elevation={3} style={{width:"100%",margin:"10px auto",padding: "20px", background:"lightblue"}} className="Fondo">
         <Typography variant="h3" component="h1" align="center">
             Administrar turnos
         </Typography>
         <Typography align="left">
             Seleccione una fecha:
         </Typography>
-        <input className={classes.inputAncho} id="date" type="date" style={{boxSizing: "border-box", padding:"15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
+        <input
+        className={classes.inputAncho}
+        id="date"
+        type="date"
+        value={fechaHoy}
+        onChange={seleccionarFecha}
+        style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
-        <TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto"}}>
-        <Table aria-label="collapsible table">
-          <TableHead>
-            <StyledTableRow>
-              <StyledTableCell align="left">Apellido y nombre</StyledTableCell>
-              <StyledTableCell align="center">DNI</StyledTableCell>
-              <StyledTableCell align="center">Asistencia</StyledTableCell>
-            </StyledTableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <Row key={row.name} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {esperaDisponible && <Cargando color="secondary"/>}
+        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto"}}>
+          <Table aria-label="collapsible table">
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell align="left">Apellido y nombre</StyledTableCell>
+                <StyledTableCell align="center">DNI</StyledTableCell>
+                <StyledTableCell align="center">Asistencia</StyledTableCell>
+              </StyledTableRow>
+            </TableHead>
+            <TableBody>
+              {turnos.map((turno,i) => (
+                <Row key={i} turno={turno} ruta={ruta} usuario={usuario}/>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>):(<Typography variant="h4"><br/>{mensaje}</Typography>)}
       </Paper>
     </div>
    
   );
 }
-
-/*import React from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-
-import Estilos from '../Estilos.js';
-
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: "orangered",
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
-
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: "400px",
-  },
-});
-
-export default function CustomizedTables() {
-  const classes2 = Estilos();
-
-  return (
-    <TableContainer component={Paper}>
-      <Table >
-        <TableHead>
-          <TableRow>
-            <StyledTableCell align="center">Apellido y Nombre</StyledTableCell>
-            <StyledTableCell align="center">DNI</StyledTableCell>
-            <StyledTableCell align="center">Número de celular</StyledTableCell>
-            <StyledTableCell align="center">Localidad</StyledTableCell>
-            <StyledTableCell align="center">Área reservada</StyledTableCell>
-            <StyledTableCell align="center">Asistencia</StyledTableCell>
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow  key={row.name}>
-                <StyledTableCell align="center" component="th" scope="row">
-                {row.name}
-                </StyledTableCell>
-                <StyledTableCell align="center">1</StyledTableCell>
-                <StyledTableCell align="center">3</StyledTableCell>
-                <StyledTableCell align="center">4</StyledTableCell>
-                <StyledTableCell align="center">5</StyledTableCell>
-                <StyledTableCell align="center">
-                <Button size="large" variant="contained" color="secondary">No asistió</Button>
-            </StyledTableCell>
-        </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
-*/

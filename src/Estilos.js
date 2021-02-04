@@ -15,15 +15,15 @@ const Estilos = makeStyles((theme) => ({
         flexWrap: 'wrap',
         padding: 10, 
         minHeight:"calc(100vh - 130px)",
-        background: "MintCream"
+        margin:"auto"
     },
-    proveedorSticky:{
-        display: 'scroll',
-        position: 'sticky',
-        top: 10,
+    fondo2:{
+        display: 'flex',
+        justifyContent: 'center',
         flexWrap: 'wrap',
-        marginBottom: 10,
-        marginTop:10
+        alignItems: 'center',
+        minHeight:"calc(100vh - 130px)",
+        maxWidth:"1000px"
     },
     margenArriba:{
         marginTop: 10,

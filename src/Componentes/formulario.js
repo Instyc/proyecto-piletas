@@ -1,13 +1,17 @@
 import React,{useState, useEffect} from 'react';
 import axios from 'axios';
-import {LinearProgress,InputLabel, Checkbox,FormControlLabel, Typography, Radio, RadioGroup, TextField, FormControl, Button, Paper, Grid, Select, MenuItem, Hidden, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@material-ui/core';
+import {LinearProgress,InputLabel, Checkbox,FormControlLabel, Typography, Radio, RadioGroup, TextField, FormControl, Button, Paper, Grid, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@material-ui/core';
 import Cargando from '@material-ui/core/LinearProgress';
 import Alert from '@material-ui/lab/Alert';
 import Estilos from '../Estilos.js';
+import Notificacion from './notificacion.js'
+import AlertaMensaje from './alerta.js'
+
 
 //Componente utilizado para crear o modificar publicaciones o solicitudes de servicios
 export default function Inicio({ruta}) {
     const [siguiente, setsiguiente] = useState(false);
+    
     return ( 
         siguiente?<Formulario setsiguiente={setsiguiente} ruta={ruta}/>:<Condiciones setsiguiente={setsiguiente}/>
     );
@@ -18,7 +22,7 @@ const Condiciones = ({setsiguiente}) => {
 
     return (
         <div className={classes.fondo}>
-            <Paper elevation={3} style={{padding: "20px", background:"LightSkyBlue"}} className="Fondo">
+            <Paper elevation={3} style={{padding: "20px", background:"lightblue", maxWidth:"85%"}} className="Fondo">
                 <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
                     <Grid item xs={12}>
                         <Typography variant="h3" component="h1" align="center">
@@ -29,10 +33,10 @@ const Condiciones = ({setsiguiente}) => {
                         <ul style={{textAlign:"left",textJustify:"auto"}}>
                             <li>Para poder realizar una reserva, debe tener un domicilio real en San Bernardo que pueda ser comprobado mediante su DNI.</li>
                             <li>Los días habilitados para asistir al complejo son de martes a domingo. El horario de apertura del complejo es de 14 a 00 hs, y el sector de las piletas cierra a las 20 hs.</li>
-                            <li>Al momento de ingresar al complejo, debe presentar su DNI y un certificado de buena sauld expedido por un organismo público.</li>
+                            <li>Al momento de ingresar al complejo, debe presentar su DNI y un certificado de buena salud expedido por un organismo público.</li>
                             <li>Luego de realizado una reserva, deberá esperar 48 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
-                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, comunicate al correo x@x.com explicando tu situación para que te podamos ofrecer una solución.</li>
+                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, comunicate al correo mainardcin@gmail.com explicando tu situación para que te podamos ofrecer una solución.</li>
                         </ul>       
                     </Grid>      
                     <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
@@ -81,7 +85,7 @@ function Alerta({funcionAceptar, persona, turno}) {
             <Button onClick={()=>{handleClose(false)}} variant="contained" color="secondary">
               Cancelar
             </Button>
-            <Button onClick={()=>{handleClose(true)}} variant="contained" color="primary" disabled={noEsta} autoFocus>
+            <Button onClick={()=>{handleClose(true)}} variant="contained" style={{background:"lightgreen"}} disabled={noEsta} autoFocus>
               Confirmar
             </Button>
             {cargando && <Cargando/>}
@@ -91,18 +95,24 @@ function Alerta({funcionAceptar, persona, turno}) {
     );
   }
 
-const Formulario = ({setsiguiente, ruta}) =>{
+const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const classes = Estilos();
+
     const [cargando, setcargando] = useState(false);
     const [abrirConfirmacion, setabrirConfirmacion] = useState(false);
     const [alertaDNI, setalertaDNI] = useState(false);
     const [tildado, settildado] = useState(false);
-    const [mensaje, setmensaje] = useState(false);
+    const [mensaje, setmensaje] = useState("");
     const [tildadoCovid, settildadoCovid] = useState(false);
     const [disponibles, setdisponibles] = useState(-1);
     const [esperaDisponible, setesperaDisponible] = useState(false);
-    const [fechaReserva, setfechaReserva] = useState("");
-    
+    const [notificar, setnotificar] = useState(false);
+    const [fechaHoy, setfechaHoy] = useState("");
+    const [turista, setturista] = useState(false);
+    const [abrirAlerta, setabrirAlerta] = useState(false);
+
+    const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
+
     //Datos de la pagina
     const [persona, setpersona] = useState({
         dni: "",
@@ -128,7 +138,8 @@ const Formulario = ({setsiguiente, ruta}) =>{
         let dia = date_.getDay()
         if(dia < 10)
             dia = "0"+dia
-
+        
+        setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
         setturno({
             ...turno,
             fecha: date_.getFullYear()+"-"+mes+"-"+dia
@@ -137,7 +148,6 @@ const Formulario = ({setsiguiente, ruta}) =>{
         setesperaDisponible(true)
         axios.get(ruta+'/turnos/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
         .then(response => {
-            console.log(response.data);
             setdisponibles(100-response.data)
             setesperaDisponible(false)
         }).catch(error => {
@@ -187,6 +197,8 @@ const Formulario = ({setsiguiente, ruta}) =>{
 
     function alertaPregunta(e){
         e.preventDefault();
+        setcargandoSolicitar(true)
+
         axios.get(ruta+'/personas?dni='+persona.dni)
         .then(response => {
             if(response.data.length === 0 || tildado===true){
@@ -202,6 +214,7 @@ const Formulario = ({setsiguiente, ruta}) =>{
                 setabrirConfirmacion(true)
             }else{
                 setalertaDNI(true)
+                setcargandoSolicitar(false)
             }
 
         }).catch(error => {
@@ -211,26 +224,26 @@ const Formulario = ({setsiguiente, ruta}) =>{
 
     function solicitarTurno(boole){
         setabrirConfirmacion(false)
+        
         if(boole){
             let aux = persona.domicilio==="San Bernardo"
             let persona_aux = persona;
             persona_aux.domicilio = aux;
             persona_aux.permitido = aux;
 
-            
             axios.get(ruta+'/personas?dni='+persona.dni)
             .then(response => {
                 if(response.data.length === 0){
                     axios.post(ruta+'/personas', persona_aux)
                     .then(response => {
-                        console.log(response.data);
+                        setcargandoSolicitar(false)
 
                         let turno_aux = turno;
                         turno_aux.persona = response.data.id;
                         
                         axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
-                            console.log("Turno realizado correctamente")
+                            setabrirAlerta(true)
                             limpiarVariables()
                             setdisponibles(disponibles-1)
                         }).catch(error => {
@@ -238,6 +251,7 @@ const Formulario = ({setsiguiente, ruta}) =>{
                         });
 
                     }).catch(error => {
+                        setcargandoSolicitar(true)
                         console.log(error.response)
                     });
                 }else{
@@ -249,39 +263,61 @@ const Formulario = ({setsiguiente, ruta}) =>{
                     let dosDiasDesp = Date.parse(ultTurno) + 1000*60*60*48 //48 horas a milisegundos
 
                     if (dosDiasDesp>Date.now() && response.data[0].turnos.length!==0){
+                        setcargandoSolicitar(false)
                         if (ultTurno<Date.now()){
-                            //Usted tiene un turno activo para la fecha XX:XX:XX
+                            let permitido = new Date(dosDiasDesp)
+                            setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDay()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
                         }else{
-                            //Debe esperar XXXXXX tiempo antes de poder volver a realizar una reserva
+                            let dia = ultTurno.getDate()
+                            let mes = ultTurno.getMonth() + 1
+                            let anio = ultTurno.getFullYear()
+
+                            if(mes < 10)
+                                mes = "0"+mes
+                            if (dia <10)
+                                dia = "0"+dia
+                            setmensaje("Usted tiene un turno activo para la fecha "+`${dia}-${mes}-${anio}`)
                         }
+                        setnotificar(true)
                     }else{
                         axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
-                            console.log("Turno realizado correctamente")
+                            setabrirAlerta(true)
                             limpiarVariables()
+                            setcargandoSolicitar(false)
                             setdisponibles(disponibles-1)
                         }).catch(error => {
+                            setcargandoSolicitar(false)
                             console.log(error.response)
                         });
                     }
                 }
             }).catch(error => {
+                setcargandoSolicitar(false)
                 console.log(error.response)
             });
+        }else{
+            setcargandoSolicitar(false)
         }
     }
 
     function seleccionarFecha(e){
         setturno({...turno, fecha: e.target.value})
         setesperaDisponible(true)
-        axios.get(ruta+'/turnos/count?fecha='+e.target.value)
-        .then(response => {
-            console.log(response.data);
-            setdisponibles(100-response.data)
+        let _fecha = new Date(e.target.value)
+        if (_fecha.getUTCDay()!==1){
+            axios.get(ruta+'/turnos/count?fecha='+e.target.value)
+            .then(response => {
+                console.log(response.data);
+                setdisponibles(100-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }else{
+            setdisponibles(-2)//Cuando se selecciona un lunes
             setesperaDisponible(false)
-        }).catch(error => {
-            console.log(error.response)
-        });
+        }
     }
     
     function x(e){
@@ -377,16 +413,20 @@ const Formulario = ({setsiguiente, ruta}) =>{
                                         value={persona.domicilio}
                                         name="domicilio"
                                         onChange={modificarInput}
-                                        
                                         id="domicilio"
                                         variant="filled"
                                         required
                                     >
-                                        <MenuItem value="San Bernardo">San Bernardo</MenuItem>
-                                        <MenuItem value="Soy turista">Soy turista</MenuItem>
+                                        <MenuItem value="San Bernardo" onClick={()=>setturista(false)}>San Bernardo</MenuItem>
+                                        <MenuItem value="Soy turista" onClick={()=>setturista(true)}>Soy turista</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>}
+
+                            {turista && <Grid item lg={12} md={12} sm={12} xs={12} align="center">
+                            <Alert variant="filled" severity="info">
+                                Si usted no posee un domicilio en San Bernardo y se encuentra vacacionando en nuestra localidad, debe contactarse al correo mainardcin@gmail.com para terminar de gestionar su turno.
+                            </Alert></Grid>}
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
                                 <input
@@ -394,14 +434,15 @@ const Formulario = ({setsiguiente, ruta}) =>{
                                 onChange={seleccionarFecha}
                                 id="date"
                                 type="date"
+                                min={fechaHoy}
                                 required
                                 value={turno.fecha}
                                 style={{boxSizing: "border-box", padding:"0px 10px",background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
-                                {esperaDisponible && <LinearProgress/>}
-                                <Typography color="secondary"> {disponibles===-1?"":`${disponibles} lugares disponibles`} </Typography>
+                                {esperaDisponible && <LinearProgress color="secondary"/>}
+                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":`${disponibles} lugares disponibles`)} </Typography>
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
@@ -439,20 +480,25 @@ const Formulario = ({setsiguiente, ruta}) =>{
                             }
                             label="Declaro bajo juramento que no tengo síntomas de COVID-19"
                             />
-
                             <Grid item xs={12} className={classes.inputAncho}>
                                 {cargando && <Cargando/>}
                             </Grid>
+
                             
+                            <Grid item xs={12} align="center" style={{margin:"15px"}}>
+                                {cargandoSolicitar && <LinearProgress color="secondary"/>}
+                            </Grid>
                             <Grid item xs={6} align="center">
                                 <Button className={classes.botones} onClick={()=>{setsiguiente(false)}} size="large" variant="contained" color="secondary">Atras</Button>
                             </Grid>
                             
                             <Grid item xs={6} align="center">
-                                <Button className={classes.botones} disabled={cargando || disponibles===0} type="submit" size="large" variant="contained" color="primary">Solicitar</Button>
+                                <Button className={classes.botones} disabled={cargando || disponibles<=0} type="submit" size="large" variant="contained" style={{background:"lightgreen"}}>Solicitar</Button>
                             </Grid>
                         </Grid>
                         {abrirConfirmacion && <Alerta funcionAceptar={solicitarTurno} persona={persona} turno={turno}/>}
+                        {notificar && <Notificacion funcionAceptar={setnotificar} mensaje={mensaje}/>}
+                        <AlertaMensaje mensaje={"¡Turno creado exitosamente!"} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
                     </FormControl>
                 </form>
                 {alertaDNI && <Alert variant="filled" severity="error">
