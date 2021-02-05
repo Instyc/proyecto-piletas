@@ -1,9 +1,8 @@
 import React, { useState} from 'react';
 //Material UI 
-import {Grid, Link as LinkMUI,  LinearProgress, Typography, TextField, Hidden, Button, Divider, } from '@material-ui/core';
+import {Grid, LinearProgress, Typography, TextField, Hidden, Button, Divider, } from '@material-ui/core';
 
 //Librerias
-import {Link} from "react-router-dom";
 import axios from 'axios'
 
 import Estilos from '../Estilos.js'

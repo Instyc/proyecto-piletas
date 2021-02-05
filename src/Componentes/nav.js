@@ -14,20 +14,20 @@ export default function Nav({setusuario,usuario}) {
     localStorage.setItem('datosLocal', JSON.stringify(null));
     setusuario({jwt:"",datosSesion:{}})
     if (history!==undefined)
-        history.push("/")
+      history.push("/")
   };
 
   return (
     <AppBar position="static" style={{backgroundColor:"#00CC66"}}>
         <Toolbar>
             
-          <Link to={"/"} style={{textDecoration:"none",color:"#393939",fontFamily: "Homework", padding:"10px"}}>
-              <img src="munilogo.png" width="76px"></img>
+          <Link to={"/"} style={{textDecoration:"none",color:"#393939",fontFamily: "Homework", padding:"0px 10px"}}>
+              <img src="municipalidad_logo.png" width="76px"></img>
           </Link>
             
           <Link to={"/"} style={{textDecoration:"none",color:"#393939",fontFamily: "Homework",}}>
               <Typography variant="h5">
-                  Complejo de piletas
+                  Complejo deportivo
               </Typography>
           </Link>
           

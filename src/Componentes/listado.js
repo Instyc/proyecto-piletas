@@ -6,10 +6,12 @@ import Cargando from '@material-ui/core/LinearProgress';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Estilos from '../Estilos.js';
+import {Check as Si, Close as No} from '@material-ui/icons/';
 
 const useRowStyles = makeStyles({
   root: {    '& > *': {
       borderBottom: 'unset',
+      padding:"5px",
     },
   },
 });
@@ -36,6 +38,15 @@ function Row({turno, ruta, usuario}) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [Turno, setTurno] = useState(turno);
+  const [juramento_dias, setjuramento_dias] = useState(false);
+
+  useEffect(()=>{
+    let fecha = new Date(turno.fecha+" 23:59:59")
+    let fecha_turno = new Date(turno.created_at);
+    let dias = parseInt((fecha - fecha_turno)/1000/60/60/24);
+    
+    setjuramento_dias(dias>2)
+  },[])
 
   let auth = 'Bearer '+usuario.jwt;
 
@@ -55,6 +66,22 @@ function Row({turno, ruta, usuario}) {
     });
   }
 
+  function asignarDeclaracion(){
+    let dec = !Turno.declarado;
+    axios.put(ruta+'/turnos/'+Turno.id,{
+      declarado: dec
+    },{headers: {'Authorization': auth}})
+    .then(response => {
+      console.log(response.data)
+      setTurno({
+        ...Turno,
+        declarado: !Turno.declarado
+      })
+    }).catch(error => {
+      console.log(error.response)
+    });
+  }
+
   return (
     <React.Fragment>
       <StyledTableRow className={classes.root}>
@@ -66,27 +93,34 @@ function Row({turno, ruta, usuario}) {
         </StyledTableCell>
         <StyledTableCell align="center">{Turno.persona.dni}</StyledTableCell>
         <StyledTableCell align="center">
-          <Button size="small" variant="contained" color={Turno.asistencia?"primary":"secondary"} onClick={asignarAsistencia}>{Turno.asistencia?"SI":"NO"}</Button>
+          <Button size="small" variant="contained" style={{margin:"5px",}} color={Turno.asistencia?"primary":"secondary"} onClick={asignarAsistencia}>{Turno.asistencia?"Si":"No"}</Button>
+          {juramento_dias && <Button size="small" variant="contained" color={Turno.declarado?"primary":"secondary"} onClick={asignarDeclaracion}>{Turno.declarado?<Si/>:<No/>}</Button>}
         </StyledTableCell>
+
       </StyledTableRow>
       <StyledTableRow>
         <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
+            <Box>
               <Grid container>
-                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
-                  <Typography variant="h6" gutterBottom component="div">
+                <Grid item lg={3} md={3} sm={12} xs={12} align="center">
+                  <Typography variant="subtitle1" gutterBottom component="div">
                     Teléfono: {Turno.persona.telefono!==""?Turno.persona.telefono:"N/A"}
                   </Typography>
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
-                  <Typography variant="h6" gutterBottom component="div">
+                <Grid item lg={3} md={3} sm={12} xs={12} align="center">
+                  <Typography variant="subtitle1" gutterBottom component="div">
                     {Turno.persona.domicilio?" Localidad: San Bernardo":" Situación: Turista"}
                   </Typography>
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} align="center">
-                  <Typography variant="h6" gutterBottom component="div">
+                <Grid item lg={3} md={3} sm={12} xs={12} align="center">
+                  <Typography variant="subtitle1" gutterBottom component="div">
                     Área: {Turno.persona.area===0?"Pileta":Turno.persona.area===1?"Camping":"Pileta y camping"}
+                  </Typography>
+                </Grid>
+                <Grid item lg={3} md={3} sm={12} xs={12} align="center">
+                  <Typography variant="subtitle1" gutterBottom component="div">
+                    Fecha de solicitud: {}{Turno.created_at.split("T")[0]}
                   </Typography>
                 </Grid>
               </Grid>
@@ -120,8 +154,27 @@ export default function Listado({ruta,usuario}) {
     setesperaDisponible(true)
     axios.get(ruta+'/turnos?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
     .then(response => {
-        setturnos(response.data)
-        setesperaDisponible(false)
+      let turnos_ordenados = response.data;
+      // array temporal contiene objetos con posición y valor de ordenamiento
+      var arregloAux = turnos_ordenados.map(function(arreglo, i) {
+        return { index: i, value: arreglo.persona.apellido.toLowerCase() };
+      })
+      // ordenando el array mapeado que contiene los valores reducidos
+      arregloAux.sort(function(a, b) {
+        if (a.value > b.value) {
+          return 1;
+        }
+        if (a.value < b.value) {
+          return -1;
+        }
+        return 0;
+      });
+      // contenedor para el orden resultante
+      var resultado = arregloAux.map(function(arreglo){
+        return turnos_ordenados[arreglo.index];
+      });
+      setturnos(resultado)
+      setesperaDisponible(false)
     }).catch(error => {
         console.log(error.response)
     });
@@ -136,9 +189,27 @@ export default function Listado({ruta,usuario}) {
     if (_fecha.getUTCDay()!==1){
         axios.get(ruta+'/turnos?fecha='+e.target.value)
         .then(response => {
-            console.log(response.data);
             setturnos([])
-            setturnos(response.data)
+            let turnos_ordenados = response.data;
+            // array temporal contiene objetos con posición y valor de ordenamiento
+            var arregloAux = turnos_ordenados.map(function(arreglo, i) {
+              return { index: i, value: arreglo.persona.apellido.toLowerCase() };
+            })
+            // ordenando el array mapeado que contiene los valores reducidos
+            arregloAux.sort(function(a, b) {
+              if (a.value > b.value) {
+                return 1;
+              }
+              if (a.value < b.value) {
+                return -1;
+              }
+              return 0;
+            });
+            // contenedor para el orden resultante
+            var resultado = arregloAux.map(function(arreglo){
+              return turnos_ordenados[arreglo.index];
+            });
+            setturnos(resultado)
             if (response.data.length===0)
               setmensaje("No existen reservas para el día seleccionado.")
             setesperaDisponible(false)
@@ -170,13 +241,17 @@ export default function Listado({ruta,usuario}) {
         style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
         {esperaDisponible && <Cargando color="secondary"/>}
-        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto"}}>
-          <Table aria-label="collapsible table">
+        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
+          <Typography align="justify" style={{fontWeight:"bold", padding:"10px"}}>
+            Declaración Jurada de Síntomas de COVID-19 para personas que hayan solicitado un turno hace más de 72 horas: presione en "X" en el caso de que la persona en cuestión haya renovado su declaración jurada y asegure no poseer síntomas de COVID-19 al momento de asistir al complejo.
+          </Typography>
+
+          <Table aria-label="collapsible table" style={{background:"rgba(0,0,0,.1)"}}>
             <TableHead>
               <StyledTableRow>
                 <StyledTableCell align="left">Apellido y nombre</StyledTableCell>
                 <StyledTableCell align="center">DNI</StyledTableCell>
-                <StyledTableCell align="center">Asistencia</StyledTableCell>
+                <StyledTableCell align="center">Asistencia/*Juramento*</StyledTableCell>
               </StyledTableRow>
             </TableHead>
             <TableBody>

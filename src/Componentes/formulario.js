@@ -22,22 +22,23 @@ const Condiciones = ({setsiguiente}) => {
 
     return (
         <div className={classes.fondo}>
-            <Paper elevation={3} style={{padding: "20px", background:"lightblue", maxWidth:"85%"}} className="Fondo">
+            <Paper elevation={3} style={{padding: "20px", background:"lightblue", maxWidth:"1600px"}} className="Fondo">
                 <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
                     <Grid item xs={12}>
-                        <Typography variant="h3" component="h1" align="center">
+                        <Typography variant="h4" component="h1" align="center">
                             Condiciones para realizar una reserva para las piletas
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <ul style={{textAlign:"left",textJustify:"auto"}}>
-                            <li>Para poder realizar una reserva, debe tener un domicilio real en San Bernardo que pueda ser comprobado mediante su DNI.</li>
                             <li>Los días habilitados para asistir al complejo son de martes a domingo. El horario de apertura del complejo es de 14 a 00 hs, y el sector de las piletas cierra a las 20 hs.</li>
                             <li>Al momento de ingresar al complejo, debe presentar su DNI y un certificado de buena salud expedido por un organismo público.</li>
                             <li>Luego de realizado una reserva, deberá esperar 48 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
-                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, comunicate al correo mainardcin@gmail.com explicando tu situación para que te podamos ofrecer una solución.</li>
-                        </ul>       
+                            <li>Para poder realizar una reserva, debe tener un domicilio real en San Bernardo que pueda ser comprobado mediante su DNI.</li>
+                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
+                            <li>Si realizas una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada al momento de ingresar.</li>
+                        <br/></ul>       
                     </Grid>      
                     <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
                 </Grid>
@@ -73,7 +74,7 @@ function Alerta({funcionAceptar, persona, turno}) {
                 Apellido: {persona.apellido}<br/>
                 DNI: {persona.dni}<br/>
                 Telefono: {persona.telefono}<br/>
-                {persona.domicilio==="San Bernardo"?"Localidad: ":"Situación: "}{persona.domicilio}<br/>
+                {persona.domicilio?"Situación: Soy turista":"Localidad: San Bernardo"}<br/>
                 Fecha reservada: {turno.fecha}<br/>
                 Área: {turno.area===0?"Pileta":(turno.area===1?"Camping":"Camping y pileta")}
             </DialogContentText>}
@@ -118,15 +119,19 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         dni: "",
         nombre:"",
         apellido: "",
-        telefono: "",
         domicilio: "San Bernardo",
-        permitido: true,
+        telefono: "",
+        dni_alojado: "",
+        nombre_alojado:"",
+        apellido_alojado: "",
+        domicilio_alojado: ""
     }); 
     
     const [turno, setturno] = useState({
         fecha: "",
         area: 2,
         asistencia: false,
+        declarado: false,
         persona: null
     });
 
@@ -183,14 +188,18 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             nombre:"",
             apellido: "",
             telefono: "",
-            domicilio: "San Bernardo",
-            permitido: true,
+            domicilio: false,
+            dni_alojado: "",
+            nombre_alojado:"",
+            apellido_alojado: "",
+            domicilio_alojado: ""
         });
 
         setturno({
             fecha: turno.fecha,
             area: 2,
             asistencia: false,
+            declarado: false,
             persona: null
         });
     }
@@ -208,8 +217,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         nombre: response.data[0].nombre,
                         apellido: response.data[0].apellido,
                         telefono: response.data[0].telefono,
-                        domicilio: response.data[0].domicilio?"San Bernardo":"Soy turista",
-                        permitido: response.data[0].permitido,
+                        domicilio: response.data[0].domicilio,
                     })
                 setabrirConfirmacion(true)
             }else{
@@ -226,10 +234,9 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         setabrirConfirmacion(false)
         
         if(boole){
-            let aux = persona.domicilio==="San Bernardo"
+            let aux = persona.domicilio
             let persona_aux = persona;
             persona_aux.domicilio = aux;
-            persona_aux.permitido = aux;
 
             axios.get(ruta+'/personas?dni='+persona.dni)
             .then(response => {
@@ -259,13 +266,13 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                     turno_aux.persona = response.data[0].id;
 
                     let posicion = response.data[0].turnos.length -1
-                    let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 00:00:00");
-                    let dosDiasDesp = Date.parse(ultTurno) + 1000*60*60*48 //48 horas a milisegundos
+                    let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 23:59:59");
+                    let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
 
-                    if (dosDiasDesp>Date.now() && response.data[0].turnos.length!==0){
+                    if (unDiaDespues>Date.now() && response.data[0].turnos.length!==0){
                         setcargandoSolicitar(false)
                         if (ultTurno<Date.now()){
-                            let permitido = new Date(dosDiasDesp)
+                            let permitido = new Date(unDiaDespues)
                             setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDay()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
                         }else{
                             let dia = ultTurno.getDate()
@@ -308,7 +315,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         if (_fecha.getUTCDay()!==1){
             axios.get(ruta+'/turnos/count?fecha='+e.target.value)
             .then(response => {
-                console.log(response.data);
                 setdisponibles(100-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
@@ -361,6 +367,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 className={classes.inputAncho}
                                 id="filled-basic"
                                 label="DNI"
+                                type="number"
                                 variant="filled"
                                 maxLength={50}
                                 required/>
@@ -401,6 +408,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                     className={classes.inputAncho}
                                     id="filled-basic"
                                     label="Número de celular"
+                                    type="number"
                                     variant="filled"
                                     maxLength={50}
                                 />
@@ -408,7 +416,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
                             {!tildado && <Grid item lg={2} md={2} sm={12} xs={12}>
                                 <FormControl className={classes.inputAncho}>
-                                    <InputLabel id="demo-simple-select-label" style={{margin:"7px 10px"}}>Domicilio</InputLabel>
+                                    <InputLabel id="demo-simple-select-label" style={{margin:"7px 10px"}}>Localidad</InputLabel>
                                     <Select
                                         value={persona.domicilio}
                                         name="domicilio"
@@ -417,18 +425,76 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                         variant="filled"
                                         required
                                     >
-                                        <MenuItem value="San Bernardo" onClick={()=>setturista(false)}>San Bernardo</MenuItem>
-                                        <MenuItem value="Soy turista" onClick={()=>setturista(true)}>Soy turista</MenuItem>
+                                        <MenuItem value={false} onClick={()=>setturista(false)}>San Bernardo</MenuItem>
+                                        <MenuItem value={true} onClick={()=>setturista(true)}>Soy turista</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>}
 
-                            {turista && <Grid item lg={12} md={12} sm={12} xs={12} align="center">
-                            <Alert variant="filled" severity="info">
-                                Si usted no posee un domicilio en San Bernardo y se encuentra vacacionando en nuestra localidad, debe contactarse al correo mainardcin@gmail.com para terminar de gestionar su turno.
-                            </Alert></Grid>}
+                            {/*Selecciona la opcion Soy turista */}
+                            {turista && !tildado && <Grid container direction="row" justify="center" alignItems="center" spacing={1} style={{margin:"10px"}}>
+                                <Alert variant="filled" severity="info">
+                                    Ingrese los datos de la persona con la cual se encuentra alojada. Al momento de asistir al complejo, deberá presentar una fotocopia del DNI de dicha persona.
+                                </Alert>
+
+                                <Grid item lg={2} md={2} sm={12} xs={12}>
+                                    <TextField
+                                    onChange={modificarInput}
+                                    value={persona.dni_alojado}
+                                    name="dni_alojado"
+                                    className={classes.inputAncho}
+                                    id="filled-basic"
+                                    label="DNI"
+                                    type="number"
+                                    variant="filled"
+                                    maxLength={50}
+                                    required/>
+                                </Grid>
+
+                                <Grid item lg={3} md={3} sm={12} xs={12}>
+                                    <TextField
+                                    onChange={modificarInput}
+                                    value={persona.nombre_alojado}
+                                    name="nombre_alojado"
+                                    className={classes.inputAncho}
+                                    id="filled-basic"
+                                    label="Nombre"
+                                    variant="filled"
+                                    maxLength={50}
+                                    required/>
+                                </Grid>
+
+                                <Grid item lg={3} md={3} sm={12} xs={12}>
+                                    <TextField
+                                    onChange={modificarInput}
+                                    value={persona.apellido_alojado}
+                                    name="apellido_alojado"
+                                    className={classes.inputAncho}
+                                    id="filled-basic"
+                                    label="Apellido"
+                                    variant="filled"
+                                    maxLength={50}
+                                    required/>
+                                </Grid>
+
+                                <Grid item lg={3} md={3} sm={12} xs={12}>
+                                    <TextField
+                                    onChange={modificarInput}
+                                    value={persona.domicilio_alojado}
+                                    name="domicilio_alojado"
+                                    className={classes.inputAncho}
+                                    id="filled-basic"
+                                    label="Domicilio"
+                                    variant="filled"
+                                    maxLength={50}
+                                    required/>
+                                </Grid>
+                            </Grid>}
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                                <Typography align="center" variant="h6">
+                                    Seleccione la fecha a reservar
+                                </Typography>
                                 <input
                                 className={classes.inputAncho}
                                 onChange={seleccionarFecha}

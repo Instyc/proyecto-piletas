@@ -8,14 +8,14 @@ import Sesion from './Componentes/sesion'
 import Nav from './Componentes/nav'
 import AlertaMensaje from './Componentes/alerta.js'
 import Estilos from './Estilos'
-import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import {HashRouter,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Copiar from '@material-ui/icons/FileCopy';
 import {Instagram, Facebook} from '@material-ui/icons';
 
 function App() {
   const classes = Estilos();
-  //const ruta = "https://piletas-sb.herokuapp.com";
-  const ruta = "http://localhost:1337";
+  const ruta = "https://piletas-sb.herokuapp.com";
+  //const ruta = "http://localhost:1337";
   const [copiado, setcopiado] = useState(false)
 
   const [usuario, setusuario] = useState({
@@ -51,23 +51,29 @@ function App() {
     if(sesionObjeto!==null){
       setusuario(sesionObjeto)
     }
+    console.log(process.env.PUBLIC_URL)
   },[])
   
   return (
     <div className="App" style={{height: "auto"}}>
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <Nav setusuario={setusuario} usuario={usuario}/>
         <Switch>
           <Route exact path={"/"}><Formulario ruta={ruta}/></Route>
-          <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to="/listar" />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
-          <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to="/" />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
+          <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
+          <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
+          <Route>
+            <div className={classes.fondo2} style={{margin:"auto"}}>
+              <img src="404.png"></img>
+            </div>
+          </Route>
         </Switch>
-      </Router>
+      </Router >
 
       <AppBar  position="relative" bottom="0px" style={{zIndex: 0, backgroundColor:"#00CC66"}}>   
           <Toolbar >
             <Grid container direction="row" alignItems="center" justify="center">
-              <Grid item xs={2} sm={2} md={2} lg={2} align="right">
+              <Grid item xs={2} sm={2} md={2} lg={2} style={{padding: "0px 15px"}} align="right">
                 <img src="munilogo.png" width="50px"></img>
               </Grid>
               <Grid item xs={10} sm={10} md={4} lg={4} align="left">
