@@ -2,12 +2,12 @@ import React, {useState, useEffect} from 'react';
 
 import './App.css';
 import {AppBar, Toolbar, Typography, Grid, Button, IconButton} from '@material-ui/core';
-import Formulario from './Componentes/formulario'
-import Listado from './Componentes/listado'
-import Sesion from './Componentes/sesion'
-import Nav from './Componentes/nav'
-import AlertaMensaje from './Componentes/alerta.js'
-import Estilos from './Estilos'
+import Formulario from './Componentes/Formulario.js'
+import Listado from './Componentes/Listado.js'
+import Sesion from './Componentes/Sesion.js'
+import Nav from './Componentes/Nav.js'
+import AlertaMensaje from './Componentes/Alerta.js'
+import Estilos from './Estilos.js'
 import {HashRouter,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Copiar from '@material-ui/icons/FileCopy';
 import {Instagram, Facebook} from '@material-ui/icons';
@@ -32,7 +32,7 @@ function App() {
     // Crea un campo de texto "oculto"
     var aux = document.createElement("input");
     // Asigna el contenido del elemento especificado al valor del campo
-    aux.setAttribute("value", "mainardcin@gmail.com");
+    aux.setAttribute("value", "complejodeportivosb@gmail.com");
     // Añade el campo a la página
     document.body.appendChild(aux);
     // Selecciona el contenido del campo
@@ -51,7 +51,7 @@ function App() {
     if(sesionObjeto!==null){
       setusuario(sesionObjeto)
     }
-    console.log(process.env.PUBLIC_URL)
+    //console.log(process.env.PUBLIC_URL)
   },[])
   
   return (
@@ -90,7 +90,7 @@ function App() {
                     Ante cualquier inconveniente con el sitio contactar a:
                   </Typography>
                   <Button style={{textTransform: "lowercase"}} onClick={copiarAlPortapapeles} startIcon={<Copiar/>}>
-                    mainardcin@gmail.com
+                    complejodeportivosb@gmail.com
                   </Button>
               </Grid>
             </Grid>

@@ -56,7 +56,6 @@ function Row({turno, ruta, usuario}) {
       asistencia: asis
     },{headers: {'Authorization': auth}})
     .then(response => {
-      console.log(response.data)
       setTurno({
         ...Turno,
         asistencia: !Turno.asistencia
@@ -72,7 +71,6 @@ function Row({turno, ruta, usuario}) {
       declarado: dec
     },{headers: {'Authorization': auth}})
     .then(response => {
-      console.log(response.data)
       setTurno({
         ...Turno,
         declarado: !Turno.declarado

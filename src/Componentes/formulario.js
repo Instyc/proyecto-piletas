@@ -4,8 +4,8 @@ import {LinearProgress,InputLabel, Checkbox,FormControlLabel, Typography, Radio,
 import Cargando from '@material-ui/core/LinearProgress';
 import Alert from '@material-ui/lab/Alert';
 import Estilos from '../Estilos.js';
-import Notificacion from './notificacion.js'
-import AlertaMensaje from './alerta.js'
+import Notificacion from './Notificacion.js'
+import AlertaMensaje from './Alerta.js'
 
 
 //Componente utilizado para crear o modificar publicaciones o solicitudes de servicios
@@ -32,12 +32,12 @@ const Condiciones = ({setsiguiente}) => {
                     <Grid item xs={12}>
                         <ul style={{textAlign:"left",textJustify:"auto"}}>
                             <li>Los días habilitados para asistir al complejo son de martes a domingo. El horario de apertura del complejo es de 14 a 00 hs, y el sector de las piletas cierra a las 20 hs.</li>
-                            <li>Al momento de ingresar al complejo, debe presentar su DNI y un certificado de buena salud expedido por un organismo público.</li>
-                            <li>Luego de realizado una reserva, deberá esperar 48 horas para poder realizar otra.</li>
+                            <li>Al momento de ingresar al complejo, deberás presentar tu DNI y un certificado de buena salud expedido por un organismo público.</li>
+                            <li>Luego de realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
-                            <li>Para poder realizar una reserva, debe tener un domicilio real en San Bernardo que pueda ser comprobado mediante su DNI.</li>
+                            <li>Para poder realizar una reserva, debés tener un domicilio real en San Bernardo que pueda ser comprobado mediante tu DNI.</li>
                             <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
-                            <li>Si realizas una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada al momento de ingresar.</li>
+                            <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada al momento de ingresar.</li>
                         <br/></ul>       
                     </Grid>      
                     <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
@@ -219,7 +219,9 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         telefono: response.data[0].telefono,
                         domicilio: response.data[0].domicilio,
                     })
+                setcargandoSolicitar(false)
                 setabrirConfirmacion(true)
+                setcargandoSolicitar(false)
             }else{
                 setalertaDNI(true)
                 setcargandoSolicitar(false)
@@ -232,7 +234,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     function solicitarTurno(boole){
         setabrirConfirmacion(false)
-        
+        setcargandoSolicitar(true)
         if(boole){
             let aux = persona.domicilio
             let persona_aux = persona;
@@ -243,22 +245,20 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                 if(response.data.length === 0){
                     axios.post(ruta+'/personas', persona_aux)
                     .then(response => {
-                        setcargandoSolicitar(false)
 
                         let turno_aux = turno;
                         turno_aux.persona = response.data.id;
                         
                         axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
+                            setcargandoSolicitar(false)
                             setabrirAlerta(true)
-                            limpiarVariables()
                             setdisponibles(disponibles-1)
                         }).catch(error => {
                             console.log(error.response)
                         });
 
                     }).catch(error => {
-                        setcargandoSolicitar(true)
                         console.log(error.response)
                     });
                 }else{
@@ -268,11 +268,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                     let posicion = response.data[0].turnos.length -1
                     let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 23:59:59");
                     let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
+                    let dosDias = Date.parse(ultTurno) + 1000*60*60*36 //36 horas a milisegundos
 
                     if (unDiaDespues>Date.now() && response.data[0].turnos.length!==0){
                         setcargandoSolicitar(false)
                         if (ultTurno<Date.now()){
-                            let permitido = new Date(unDiaDespues)
+                            let permitido = new Date(dosDias)
                             setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDay()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
                         }else{
                             let dia = ultTurno.getDate()
@@ -283,15 +284,15 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 mes = "0"+mes
                             if (dia <10)
                                 dia = "0"+dia
-                            setmensaje("Usted tiene un turno activo para la fecha "+`${dia}-${mes}-${anio}`)
+                            setmensaje("Usted tiene un turno activo para la fecha "+`${dia}-${mes}-${anio}`+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
                         }
                         setnotificar(true)
                     }else{
                         axios.post(ruta+'/turnos', turno_aux)
                         .then(response => {
+                            setcargandoSolicitar(false)
                             setabrirAlerta(true)
                             limpiarVariables()
-                            setcargandoSolicitar(false)
                             setdisponibles(disponibles-1)
                         }).catch(error => {
                             setcargandoSolicitar(false)

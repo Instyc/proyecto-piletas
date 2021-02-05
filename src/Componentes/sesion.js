@@ -51,7 +51,6 @@ export default function IniciarSesion({ruta,setusuario}) {
     password: datos.contrasena
     })
     .then(response => {
-        console.log(response.data)
         setusuario(response.data)
 
         localStorage.setItem('datosLocal', JSON.stringify({
