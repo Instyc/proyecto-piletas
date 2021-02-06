@@ -51,27 +51,24 @@ function App() {
     if(sesionObjeto!==null){
       setusuario(sesionObjeto)
     }
-    //console.log(process.env.PUBLIC_URL)
+    console.log(process.env.PUBLIC_URL)
   },[])
   
   return (
     <div className="App" style={{height: "auto"}}>
-      <HashRouter basename={process.env.PUBLIC_URL}>
+      <Router basename={process.env.PUBLIC_URL}>
         <Nav setusuario={setusuario} usuario={usuario}/>
-
+        <Switch>
           <Route exact path={"/"}><Formulario ruta={ruta}/></Route>
           <Route path={"/sesion/"}>{usuario.jwt!==""?<Redirect to={"/listar/"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar/"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
-          {
-            /**
-             * <Route>
+          <Route>
             <div className={classes.fondo2} style={{margin:"auto"}}>
               <img src="404.png" alt=""></img>
             </div>
           </Route>
-             */
-          }
-      </HashRouter>
+        </Switch>
+      </Router>
 
       <AppBar  position="relative" bottom="0px" style={{zIndex: 0, backgroundColor:"#00CC66"}}>   
           <Toolbar >
