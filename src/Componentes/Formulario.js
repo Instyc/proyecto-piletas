@@ -119,7 +119,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         dni: "",
         nombre:"",
         apellido: "",
-        domicilio: false,
+        domicilio: '',
         telefono: "",
         dni_alojado: "",
         nombre_alojado:"",
@@ -189,7 +189,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             nombre:"",
             apellido: "",
             telefono: "",
-            domicilio: false,
+            domicilio: '',
             dni_alojado: "",
             nombre_alojado:"",
             apellido_alojado: "",
@@ -250,8 +250,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                 if(response.data.length === 0){
                     axios.post(ruta+'/personas', persona_aux)
                     .then(response => {
-                        console.log(response.data)
-
                         let turno_aux = turno;
                         turno_aux.persona = response.data.id;
                         
@@ -259,6 +257,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         .then(response => {
                             setcargandoSolicitar(false)
                             setabrirAlerta(true)
+                            limpiarVariables()
                             setdisponibles(disponibles-1)
                         }).catch(error => {
                             console.log(error.response)
