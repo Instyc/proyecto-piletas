@@ -50,8 +50,7 @@ const Condiciones = ({setsiguiente}) => {
 function Alerta({funcionAceptar, persona, turno}) {
     const [open, setOpen] = useState(true);
     const [cargando, setcargando] = useState(false)
-    const [noEsta, setnoEsta] = useState("")
-    setnoEsta(persona.nombre==="")
+    const [noEsta, setnoEsta] = useState(persona.nombre==="")
     //Ejecutamos la función que se pasa como parámetro
     const handleClose = (boole) => {
       setcargando(true)
@@ -218,8 +217,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         dni: response.data[0].dni,
                         nombre: response.data[0].nombre,
                         apellido: response.data[0].apellido,
-                        telefono: response.data[0].telefono,
                         domicilio: response.data[0].domicilio,
+                        telefono: response.data[0].telefono,
+                        dni_alojado: response.data[0].dni_alojado,
+                        nombre_alojado: response.data[0].nombre_alojado,
+                        apellido_alojado: response.data[0].apellido_alojado,
+                        domicilio_alojado: response.data[0].domicilio_alojado,
                     })
                 setcargandoSolicitar(false)
                 setabrirConfirmacion(true)
@@ -247,6 +250,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                 if(response.data.length === 0){
                     axios.post(ruta+'/personas', persona_aux)
                     .then(response => {
+                        console.log(response.data)
 
                         let turno_aux = turno;
                         turno_aux.persona = response.data.id;
@@ -286,7 +290,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 mes = "0"+mes
                             if (dia <10)
                                 dia = "0"+dia
-                            setmensaje("Usted tiene un turno activo para la fecha "+{dia}+"-"+{mes}+"-"+{anio}+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
+                            setmensaje("Usted tiene un turno activo para la fecha "+dia+"-"+mes+"-"+anio+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
                         }
                         setnotificar(true)
                     }else{
