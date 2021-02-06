@@ -8,7 +8,7 @@ import Sesion from './Componentes/Sesion.js'
 import Nav from './Componentes/Nav.js'
 import AlertaMensaje from './Componentes/Alerta.js'
 import Estilos from './Estilos.js'
-import {HashRouter,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import {HashRouter ,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Copiar from '@material-ui/icons/FileCopy';
 import {Instagram, Facebook} from '@material-ui/icons';
 
@@ -56,25 +56,28 @@ function App() {
   
   return (
     <div className="App" style={{height: "auto"}}>
-      <Router basename={process.env.PUBLIC_URL}>
+      <HashRouter basename={process.env.PUBLIC_URL}>
         <Nav setusuario={setusuario} usuario={usuario}/>
-        <Switch>
+
           <Route exact path={"/"}><Formulario ruta={ruta}/></Route>
-          <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
-          <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
-          <Route>
+          <Route path={"/sesion/"}>{usuario.jwt!==""?<Redirect to={"/listar/"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
+          <Route path={"/listar/"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
+          {
+            /**
+             * <Route>
             <div className={classes.fondo2} style={{margin:"auto"}}>
-              <img src="404.png"></img>
+              <img src="404.png" alt=""></img>
             </div>
           </Route>
-        </Switch>
-      </Router >
+             */
+          }
+      </HashRouter>
 
       <AppBar  position="relative" bottom="0px" style={{zIndex: 0, backgroundColor:"#00CC66"}}>   
           <Toolbar >
             <Grid container direction="row" alignItems="center" justify="center">
               <Grid item xs={2} sm={2} md={2} lg={2} style={{padding: "0px 15px"}} align="right">
-                <img src="munilogo.png" width="50px"></img>
+                <img src="munilogo.png" alt="" width="50px"></img>
               </Grid>
               <Grid item xs={10} sm={10} md={4} lg={4} align="left">
                   <Typography style={{color: "black"}} variant="h6">

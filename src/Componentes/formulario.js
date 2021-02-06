@@ -50,7 +50,8 @@ const Condiciones = ({setsiguiente}) => {
 function Alerta({funcionAceptar, persona, turno}) {
     const [open, setOpen] = useState(true);
     const [cargando, setcargando] = useState(false)
-    const [noEsta, setnoEsta] = useState(persona.nombre==="")
+    const [noEsta, setnoEsta] = useState("")
+    setnoEsta(persona.nombre==="")
     //Ejecutamos la función que se pasa como parámetro
     const handleClose = (boole) => {
       setcargando(true)
@@ -119,7 +120,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         dni: "",
         nombre:"",
         apellido: "",
-        domicilio: "San Bernardo",
+        domicilio: false,
         telefono: "",
         dni_alojado: "",
         nombre_alojado:"",
@@ -136,6 +137,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     });
 
     useEffect(()=>{
+        setcargando(true)
         let date_ = new Date();
         let mes = date_.getMonth() + 1
         if(mes < 10)
@@ -149,7 +151,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             ...turno,
             fecha: date_.getFullYear()+"-"+mes+"-"+dia
         })
-
+        setcargando(false)
         setesperaDisponible(true)
         axios.get(ruta+'/turnos/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
         .then(response => {
@@ -284,7 +286,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 mes = "0"+mes
                             if (dia <10)
                                 dia = "0"+dia
-                            setmensaje("Usted tiene un turno activo para la fecha "+`${dia}-${mes}-${anio}`+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
+                            setmensaje("Usted tiene un turno activo para la fecha "+{dia}+"-"+{mes}+"-"+{anio}+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
                         }
                         setnotificar(true)
                     }else{
@@ -327,12 +329,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         }
     }
     
-    function x(e){
-        const re = /^[0-9\b]+$/;
-        if (e.target.value === '' || re.test(e.target.value)) {
-            this.setState({value: e.target.value})
-        }
-    }
     
     return (
         <div className={classes.fondo}>
@@ -528,7 +524,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             </Typography>                                
 
                             <Grid item sm={12}>
-                                <img src="sintomas.jpg" width="100%"></img>
+                                <img src="sintomas.jpg" width="100%" alt=""></img>
                                 <br/>
                                 <br/>
                                 <Typography fontWeight="fontWeightBold" align="justify">

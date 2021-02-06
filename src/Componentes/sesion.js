@@ -12,10 +12,8 @@ import {useHistory } from "react-router-dom";
 export default function IniciarSesion({ruta,setusuario}) {
   const classes = Estilos();
   let history = useHistory();
-  const [open, setOpen] = useState(false);
   const [cargando, setcargando] = useState(false);
   const [alerta, setalerta] = useState("");
-  const [pwd_olvidada, setpwd_olvidada] = useState(false);
 
   //Los datos inician vacíos
   const [datos, setdatos] = useState({
@@ -59,9 +57,8 @@ export default function IniciarSesion({ruta,setusuario}) {
         }));
         
         setcargando(false)
-        setOpen(false)
 
-        history.push("/listar")
+        history.push("/listar/")
     })
     .catch(error => {
     // Ocurrió un error
