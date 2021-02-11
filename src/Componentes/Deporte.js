@@ -711,7 +711,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
                             </Typography>                                
 
                             <Grid item sm={12}>
-                                <img src="sintomas.jpg" width="100%" alt=""></img>
+                                <img src="../sintomas.jpg" width="100%" alt=""></img>
                                 <br/>
                                 <br/>
                                 <Typography fontWeight="fontWeightBold" align="justify">
