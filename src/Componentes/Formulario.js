@@ -31,13 +31,16 @@ const Condiciones = ({setsiguiente}) => {
                     </Grid>
                     <Grid item xs={12}>
                         <ul style={{textAlign:"left",textJustify:"auto"}}>
-                            <li>Los días habilitados para asistir al complejo son de martes a domingo. El horario de apertura del complejo es de 14 a 00 hs, y el sector de las piletas cierra a las 20 hs.</li>
+                            <li>Los días habilitados para asistir al complejo son de martes a domingo.</li>
+                            <li>Los horarios de apertura del complejo son: martes a viernes de 14 a 22 hs, sábados de 14 a 00 hs y domingos de 9:30 a 00 hs. El sector de las piletas cierra a las 20 hs.</li>
                             <li>Al momento de ingresar al complejo, deberás presentar tu DNI y un certificado de buena salud expedido por un organismo público.</li>
                             <li>Luego de realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
                             <li>Para poder realizar una reserva, debés tener un domicilio real en San Bernardo que pueda ser comprobado mediante tu DNI.</li>
                             <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
-                            <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada al momento de ingresar.</li>
+                            <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada sobre síntomas de COVID-19 al momento de ingresar.</li>
+                            <li>Recordá que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
+                            <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo.</li></strong>
                         <br/></ul>       
                     </Grid>      
                     <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
@@ -141,11 +144,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         let mes = date_.getMonth() + 1
         if(mes < 10)
             mes = "0"+mes
-        let dia = date_.getDay()
+        let dia = date_.getDate()
         if(dia < 10)
             dia = "0"+dia
         
         setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+        
         setturno({
             ...turno,
             fecha: date_.getFullYear()+"-"+mes+"-"+dia
@@ -279,7 +283,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         setcargandoSolicitar(false)
                         if (ultTurno<Date.now()){
                             let permitido = new Date(dosDias)
-                            setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDay()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
+                            setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDate()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
                         }else{
                             let dia = ultTurno.getDate()
                             let mes = ultTurno.getMonth() + 1
@@ -507,8 +511,9 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                                {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}
                                 {esperaDisponible && <LinearProgress color="secondary"/>}
-                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":`${disponibles} lugares disponibles`)} </Typography>
+                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:`${disponibles} lugares disponibles`))} </Typography>
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">

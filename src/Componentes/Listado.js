@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react';
 import axios from 'axios';
+import {Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import {Box, Collapse, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Typography, Paper, Grid } from '@material-ui/core';
 import Cargando from '@material-ui/core/LinearProgress';
@@ -108,12 +109,12 @@ function Row({turno, ruta, usuario}) {
                 </Grid>
                 <Grid item lg={3} md={3} sm={12} xs={12} align="center">
                   <Typography variant="subtitle1" gutterBottom component="div">
-                    {Turno.persona.domicilio?" Localidad: San Bernardo":" Situación: Turista"}
+                    {Turno.persona.domicilio?" Situación: Turista":" Localidad: San Bernardo"}
                   </Typography>
                 </Grid>
                 <Grid item lg={3} md={3} sm={12} xs={12} align="center">
                   <Typography variant="subtitle1" gutterBottom component="div">
-                    Área: {Turno.persona.area===0?"Pileta":Turno.persona.area===1?"Camping":"Pileta y camping"}
+                    Área: {Turno.area===0?"Pileta":Turno.area===1?"Camping":"Pileta y camping"}
                   </Typography>
                 </Grid>
                 <Grid item lg={3} md={3} sm={12} xs={12} align="center">
@@ -122,6 +123,34 @@ function Row({turno, ruta, usuario}) {
                   </Typography>
                 </Grid>
               </Grid>
+              {
+                Turno.persona.domicilio &&
+                <Grid container>
+                  <Grid item lg={12} md={12} sm={12} xs={12} align="center">
+                    <hr/>
+                  </Grid>
+                  <Grid item lg={12} md={12} sm={12} xs={12} align="center">
+                    <Typography variant="subtitle1" gutterBottom component="div">
+                      Datos de la persona con la que se aloja:
+                    </Typography>
+                  </Grid>
+                  <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                    <Typography variant="subtitle1" gutterBottom component="div">
+                      DNI: {Turno.persona.dni_alojado}
+                    </Typography>
+                  </Grid>
+                  <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                    <Typography variant="subtitle1" gutterBottom component="div">
+                      Apellido y Nombre: {`${Turno.persona.apellido_alojado} ${Turno.persona.nombre_alojado}`}
+                    </Typography>
+                  </Grid>
+                  <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                    <Typography variant="subtitle1" gutterBottom component="div">
+                      Domicilio: {Turno.persona.domicilio_alojado}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              }
             </Box>
           </Collapse>
         </StyledTableCell>
@@ -143,7 +172,7 @@ export default function Listado({ruta,usuario}) {
     let mes = date_.getMonth() + 1
     if(mes < 10)
         mes = "0"+mes
-    let dia = date_.getDay()
+    let dia = date_.getDate()
     if(dia < 10)
         dia = "0"+dia
     
@@ -227,9 +256,20 @@ export default function Listado({ruta,usuario}) {
         <Typography variant="h3" component="h1" align="center">
             Administrar turnos
         </Typography>
-        <Typography align="left">
-            Seleccione una fecha:
-        </Typography>
+        <Grid container>
+          <Grid item lg={3} md={3} sm={4} xs={4} align="left">
+            <Typography variant="subtitle1" gutterBottom component="div">
+              Seleccione una fecha:
+            </Typography>
+          </Grid>
+          <Grid item lg={9} md={9} sm={8} xs={8} align="right">
+            <Link to={"/listarDeporte/"} style={{textDecoration:"none", padding: 0, color:"black"}}>
+              <Button align="right" color="primary" style={{marginLeft: "auto"}}>
+                Listado de reservas deportivas
+              </Button>
+            </Link>
+          </Grid>
+        </Grid>
         <input
         className={classes.inputAncho}
         id="date"
