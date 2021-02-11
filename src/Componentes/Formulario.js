@@ -34,10 +34,10 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Los días habilitados para asistir al complejo son de martes a domingo.</li>
                             <li>Los horarios de apertura del complejo son: martes a viernes de 14 a 22 hs, sábados de 14 a 00 hs y domingos de 9:30 a 00 hs. El sector de las piletas cierra a las 20 hs.</li>
                             <li>Al momento de ingresar al complejo, deberás presentar tu DNI y un certificado de buena salud expedido por un organismo público.</li>
-                            <li>Luego de realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
+                            <li>Luego de haber realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
                             <li>Para poder realizar una reserva, debés tener un domicilio real en San Bernardo que pueda ser comprobado mediante tu DNI.</li>
-                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
+                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad desde otra provincia, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
                             <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada sobre síntomas de COVID-19 al momento de ingresar.</li>
                             <li>Recordá que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
                             <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo.</li></strong>

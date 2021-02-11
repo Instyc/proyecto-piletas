@@ -30,7 +30,7 @@ export default function Nav({setusuario,usuario}) {
           </Grid>
 
           <Grid item lg={6} md={6} sm={12} xs={12} align="right">
-              <Link to={"/deporte/"} style={{textDecoration:"none", padding: 0, color:"black"}}>
+              <Link to={"/deporte"} style={{textDecoration:"none", padding: 0, color:"black"}}>
                   <Button align="right" startIcon={<img src="deporte.png" alt="" width="50px"></img>} color="default" style={{marginLeft: "auto"}}>
                       Reserva de canchas deportivas
                   </Button>
@@ -42,9 +42,6 @@ export default function Nav({setusuario,usuario}) {
             </Button>}
           </Grid>
         </Grid>
-            
-
-
         </Toolbar>
     </AppBar>
   );

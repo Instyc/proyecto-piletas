@@ -58,7 +58,7 @@ export default function IniciarSesion({ruta,setusuario}) {
         
         setcargando(false)
 
-        history.push("/listar/")
+        history.push("/listar")
     })
     .catch(error => {
     // Ocurrió un error

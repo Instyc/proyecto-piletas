@@ -263,7 +263,7 @@ export default function Listado({ruta,usuario}) {
             </Typography>
           </Grid>
           <Grid item lg={9} md={9} sm={8} xs={8} align="right">
-            <Link to={"/listarDeporte/"} style={{textDecoration:"none", padding: 0, color:"black"}}>
+            <Link to={"/listarDeporte"} style={{textDecoration:"none", padding: 0, color:"black"}}>
               <Button align="right" color="primary" style={{marginLeft: "auto"}}>
                 Listado de reservas deportivas
               </Button>
