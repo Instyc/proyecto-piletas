@@ -176,6 +176,12 @@ function Alerta({funcionAceptar, persona, deporte}) {
         setcargando(false)
         setesperaDisponible(true)
         axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
+        setcargando(false)
+        setesperaDisponible(true)
+        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
+        setcargando(false)
+        setesperaDisponible(true)
+        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
         .then(response => {
             setdisponibles(2-response.data)
             setesperaDisponible(false)
@@ -327,11 +333,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
         }
     }
 
-    /*useEffect(()=>{
-        console.log(persona)
-        console.log(deporte)
-    },[persona,[deporte]])*/
-
     function solicitarDeporte(boole){
         setabrirConfirmacion(false)
         setcargandoSolicitar(true)
@@ -404,11 +405,10 @@ function Alerta({funcionAceptar, persona, deporte}) {
                 let integrante_aux = response2.data
 
                 if(response2.data.length === 0){
-                    axios.post(ruta+'/personas', integrante)
-                    .then(response3 =>{
-                        deporte_aux.personas.push(response3.data.id)
-                        return response3.data.id
-                    })
+                    let response3 = await axios.post(ruta+'/personas', integrante)
+                    
+                    deporte_aux.personas.push(response3.data.id)
+                    return response3.data.id
                 }else{
                     deporte_aux.personas.push(response2.data[0].id)
                     return response2.data[0].id
@@ -417,18 +417,13 @@ function Alerta({funcionAceptar, persona, deporte}) {
               console.log(error.response)
             }
         }))
-
+        
         deporte_aux.horario = Number(deporte_aux.horario)
-        setdeporteACargar(deporte_aux)
+        cargarDeporte(deporte_aux)
     }
-
-    useEffect(()=>{
-        cargarDeporte(deporteACargar)
-    },[deporteACargar])
 
     function cargarDeporte(depo){
         if (depo!==null){
-            console.log("Antes de cargar: ", depo)
             axios.post(ruta+'/deportes', depo)
             .then(response => {
                 setcargandoSolicitar(false)
@@ -783,6 +778,17 @@ const Integrante = React.memo(({integrante, i, guardarIntegrante}) =>{
     function guardarDatos(){
         if(guardar){
             setguardar(false)
+            guardarIntegrante({
+                dni: "",
+                nombre:"",
+                apellido: "",
+                domicilio: false,
+                telefono: "",
+                dni_alojado: "",
+                nombre_alojado:"",
+                apellido_alojado: "",
+                domicilio_alojado: ""
+            },i)
         }else{
             setguardar(true)
             guardarIntegrante(datosIntegrante,i)
