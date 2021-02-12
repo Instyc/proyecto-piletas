@@ -23,7 +23,7 @@ export default function Nav({setusuario,usuario}) {
               <Link to={"/"} style={{textDecoration:"none", padding: 0, color:"black"}}>
                   <Button align="left" startIcon={<img src="municipalidad_logo.png" alt="" width="50px"></img>} color="default" style={{marginLeft: "auto"}}>
                     <Typography variant="h5">
-                        Complejo deportivo
+                        Complejo recreativo
                     </Typography>
                   </Button>
               </Link>

@@ -37,9 +37,10 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Luego de haber realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
                             <li>Para poder realizar una reserva, debés tener un domicilio real en San Bernardo que pueda ser comprobado mediante tu DNI.</li>
-                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad desde otra provincia, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
+                            <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad desde <strong>otra provincia</strong>, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
                             <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada sobre síntomas de COVID-19 al momento de ingresar.</li>
-                            <li>Recordá que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
+                            <li>Para cancelar una reserva, comunicate al correo complejodeportivosb@gmail.com junto con tus datos y una foto del frente y dorso de tu documento.</li>
+                            <li>Tené en cuenta que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
                             <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo.</li></strong>
                         <br/></ul>       
                     </Grid>      

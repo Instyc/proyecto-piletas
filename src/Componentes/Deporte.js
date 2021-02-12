@@ -35,6 +35,7 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Los turnos para las canchas deportivas son de 20 a 21hs y de 21 a 22hs.</li>
                             <li>Al momento de ingresar al complejo, deberás presentar tu DNI.</li>
                             <li>Luego de realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
+                            <li>Para cancelar o modificar los datos de tu reserva, comunicate al correo complejodeportivosb@gmail.com.</li>
                             <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo.</li></strong>
                         <br/></ul>       
                     </Grid>
@@ -114,6 +115,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
     const [abrirAlerta, setabrirAlerta] = useState(false);
     const [cantidadJugadores, setcantidadJugadores] = useState('');
     const [jugadores, setjugadores] = useState([]);
+    const [deporteACargar, setdeporteACargar] = useState(null);
 
     const [noGuardado, setnoGuardado] = useState(false);
 
@@ -172,7 +174,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         setesperaDisponible(true)
         axios.get(ruta+'/deportes/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia+'&horario=0'+'&tipo=0')
         .then(response => {
-            setdisponibles(1-response.data)
+            setdisponibles(2-response.data)
             setesperaDisponible(false)
         }).catch(error => {
             console.log(error.response)
@@ -211,7 +213,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         if (_fecha.getUTCDay()!==1){
             axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+deporte.horario+'&tipo='+(e.target.value==="Fútbol"?'0':(e.target.value==="Voley"?'1':'2')))
             .then(response => {
-                setdisponibles(1-response.data)
+                setdisponibles(2-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
                 console.log(error.response)
@@ -239,7 +241,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         if (_fecha.getUTCDay()!==1){
             axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+e.target.value+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
             .then(response => {
-                setdisponibles(1-response.data)
+                setdisponibles(2-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
                 console.log(error.response)
@@ -413,22 +415,32 @@ function Alerta({funcionAceptar, persona, deporte}) {
             }
         }))
 
-        deporte_aux.cantidad = Number(deporte_aux.cantidad)
         deporte_aux.horario = Number(deporte_aux.horario)
 
-        console.log(deporte_aux)
+        setdeporteACargar(deporte_aux)
+        
+    }
 
-        axios.post(ruta+'/deportes', deporte_aux)
-        .then(response => {
-            setcargandoSolicitar(false)
-            setabrirAlerta(true)
-            limpiarVariables()
-            setdisponibles(disponibles-1)
-            setjugadores([])
-        }).catch(error => {
-            setcargandoSolicitar(false)
-            console.log(error.response)
-        });
+    useEffect(()=>{
+        cargarDeporte(deporteACargar)
+    },[deporteACargar])
+
+    function cargarDeporte(depo){
+        if (depo!==null){
+            console.log("Antes de cargar: ", depo)
+            axios.post(ruta+'/deportes', depo)
+            .then(response => {
+                setcargandoSolicitar(false)
+                console.log("Después de cargar: ", response.data)
+                setabrirAlerta(true)
+                limpiarVariables()
+                setdisponibles(disponibles-1)
+                setjugadores([])
+            }).catch(error => {
+                setcargandoSolicitar(false)
+                console.log(error.response)
+            });
+        }
     }
 
     function seleccionarFecha(e){
@@ -438,7 +450,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         if (_fecha.getUTCDay()!==1){
             axios.get(ruta+'/deportes/count?fecha='+e.target.value+'&horario='+deporte.horario+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
             .then(response => {
-                setdisponibles(1-response.data)
+                setdisponibles(2-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
                 console.log(error.response)
@@ -679,7 +691,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                     <Select
                                         value={cantidadJugadores}
                                         name="cantidad"
-                                        onChange={inputDeporte}
                                         id="cantidad"
                                         variant="filled"
                                         required
