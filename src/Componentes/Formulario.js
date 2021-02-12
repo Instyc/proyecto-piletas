@@ -149,15 +149,18 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         if(dia < 10)
             dia = "0"+dia
         
-        setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+        //let fecha_ = date_.getFullYear()+"-"+mes+"-"+dia
+        let fecha_ = "2021-02-14"
+
+        setfechaHoy(fecha_)
         
         setturno({
             ...turno,
-            fecha: date_.getFullYear()+"-"+mes+"-"+dia
+            fecha: fecha_
         })
         setcargando(false)
         setesperaDisponible(true)
-        axios.get(ruta+'/turnos/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
+        axios.get(ruta+'/turnos/count?fecha='+fecha_)
         .then(response => {
             setdisponibles(100-response.data)
             setesperaDisponible(false)

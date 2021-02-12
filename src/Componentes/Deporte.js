@@ -164,15 +164,18 @@ function Alerta({funcionAceptar, persona, deporte}) {
         if(dia < 10)
             dia = "0"+dia
         
-        setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+        //let fecha_ = date_.getFullYear()+"-"+mes+"-"+dia
+        let fecha_ = "2021-02-14"
+
+        setfechaHoy(fecha_)
         
         setdeporte({
             ...deporte,
-            fecha: date_.getFullYear()+"-"+mes+"-"+dia
+            fecha: fecha_
         })
         setcargando(false)
         setesperaDisponible(true)
-        axios.get(ruta+'/deportes/count?fecha='+date_.getFullYear()+"-"+mes+"-"+dia+'&horario=0'+'&tipo=0')
+        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
         .then(response => {
             setdisponibles(2-response.data)
             setesperaDisponible(false)
@@ -416,9 +419,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         }))
 
         deporte_aux.horario = Number(deporte_aux.horario)
-
         setdeporteACargar(deporte_aux)
-        
     }
 
     useEffect(()=>{
