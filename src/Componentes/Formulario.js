@@ -278,39 +278,36 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                     let turno_aux = turno;
                     turno_aux.persona = response.data[0].id;
 
-                    let posicion = response.data[0].turnos.length -1
-                    let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 23:59:59");
-                    let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
-                    let dosDias = Date.parse(ultTurno) + 1000*60*60*36 //36 horas a milisegundos
-
-                    if (unDiaDespues>Date.now() && response.data[0].turnos.length!==0){
-                        setcargandoSolicitar(false)
-                        if (ultTurno<Date.now()){
-                            let permitido = new Date(dosDias)
-                            setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDate()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
+                    let posicion = response.data[0].turnos.length
+                    
+                    if (posicion!==0){
+                        posicion-=1
+                        let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 23:59:59");
+                        let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
+                        let dosDias = Date.parse(ultTurno) + 1000*60*60*36 //36 horas a milisegundos
+                        
+                        if (unDiaDespues>Date.now() && response.data[0].turnos.length!==0){
+                            setcargandoSolicitar(false)
+                            if (ultTurno<Date.now()){
+                                let permitido = new Date(dosDias)
+                                setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDate()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
+                            }else{
+                                let dia = ultTurno.getDate()
+                                let mes = ultTurno.getMonth() + 1
+                                let anio = ultTurno.getFullYear()
+    
+                                if(mes < 10)
+                                    mes = "0"+mes
+                                if (dia <10)
+                                    dia = "0"+dia
+                                setmensaje("Usted tiene un turno activo para la fecha "+dia+"-"+mes+"-"+anio+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar adjuntado sus datos y una foto del frente y dorso de su documento.")
+                            }
+                            setnotificar(true)
                         }else{
-                            let dia = ultTurno.getDate()
-                            let mes = ultTurno.getMonth() + 1
-                            let anio = ultTurno.getFullYear()
-
-                            if(mes < 10)
-                                mes = "0"+mes
-                            if (dia <10)
-                                dia = "0"+dia
-                            setmensaje("Usted tiene un turno activo para la fecha "+dia+"-"+mes+"-"+anio+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
+                            hacerPiletaTurno(turno_aux)
                         }
-                        setnotificar(true)
                     }else{
-                        axios.post(ruta+'/turnos', turno_aux)
-                        .then(response => {
-                            setcargandoSolicitar(false)
-                            setabrirAlerta(true)
-                            limpiarVariables()
-                            setdisponibles(disponibles-1)
-                        }).catch(error => {
-                            setcargandoSolicitar(false)
-                            console.log(error.response)
-                        });
+                        hacerPiletaTurno(turno_aux)
                     }
                 }
             }).catch(error => {
@@ -320,6 +317,19 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         }else{
             setcargandoSolicitar(false)
         }
+    }
+
+    function hacerPiletaTurno(turno_aux){
+        axios.post(ruta+'/turnos', turno_aux)
+        .then(response => {
+            setcargandoSolicitar(false)
+            setabrirAlerta(true)
+            limpiarVariables()
+            setdisponibles(disponibles-1)
+        }).catch(error => {
+            setcargandoSolicitar(false)
+            console.log(error.response)
+        });
     }
 
     function seleccionarFecha(e){
