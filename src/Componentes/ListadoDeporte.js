@@ -7,7 +7,6 @@ import Cargando from '@material-ui/core/LinearProgress';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Estilos from '../Estilos.js';
-import {Check as Si, Close as No} from '@material-ui/icons/';
 
 const useRowStyles = makeStyles({
   root: {    '& > *': {
@@ -39,15 +38,6 @@ function Row({turno, ruta, usuario}) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [Turno, setTurno] = useState(turno);
-  const [juramento_dias, setjuramento_dias] = useState(false);
-
-  useEffect(()=>{
-    let fecha = new Date(turno.fecha+" 23:59:59")
-    let fecha_turno = new Date(turno.created_at);
-    let dias = parseInt((fecha - fecha_turno)/1000/60/60/24);
-    
-    setjuramento_dias(dias>2)
-  },[])
 
   let auth = 'Bearer '+usuario.jwt;
 
@@ -76,7 +66,7 @@ function Row({turno, ruta, usuario}) {
           {Turno.nombre_equipo}
         </StyledTableCell>
         <StyledTableCell align="center">{Turno.tipo===0?"Fútbol":(Turno.tipo===1?"Voley":"Básquet")}</StyledTableCell>
-        <StyledTableCell align="center">{Turno.horario===0?"De 20 a 21 hs":"De 21 a 22 hs"}</StyledTableCell>
+        <StyledTableCell align="center">{Turno.horario===0?"De 20 a 21 hs":(Turno.horario===1?"De 21 a 22 hs":"De 22 a 23 hs")}</StyledTableCell>
 
       </StyledTableRow>
       <StyledTableRow>

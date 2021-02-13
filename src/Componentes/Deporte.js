@@ -32,7 +32,7 @@ const Condiciones = ({setsiguiente}) => {
                     <Grid item xs={12}>
                         <ul style={{textAlign:"left",textJustify:"auto"}}>
                             <li>Los días en donde se puede solicitar turno para realizar actividades deportivas son de martes a domingos.</li>
-                            <li>Los turnos para las canchas deportivas son de 20 a 21hs y de 21 a 22hs.</li>
+                            <li>Los turnos para las canchas deportivas son de 20 a 21hs, de 21 a 22hs y de 22 a 23hs.</li>
                             <li>Al momento de ingresar al complejo, deberás presentar tu DNI.</li>
                             <li>Luego de realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
                             <li>Para cancelar o modificar los datos de tu reserva, comunicate al correo complejodeportivosb@gmail.com.</li>
@@ -173,12 +173,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
             ...deporte,
             fecha: fecha_
         })
-        setcargando(false)
-        setesperaDisponible(true)
-        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
-        setcargando(false)
-        setesperaDisponible(true)
-        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
         setcargando(false)
         setesperaDisponible(true)
         axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
@@ -644,6 +638,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                     <RadioGroup aria-label="Horario" name="horario" value={String(deporte.horario)} onChange={seleccionarHorario}>
                                     <FormControlLabel value={"0"} control={<Radio />} label="De 20 a 21 hs" />
                                     <FormControlLabel value={"1"} control={<Radio />} label="De 21 a 22 hs" />
+                                    <FormControlLabel value={"2"} control={<Radio />} label="De 22 a 23 hs" />
                                     </RadioGroup>
                                 </FormControl>
                             </Grid>

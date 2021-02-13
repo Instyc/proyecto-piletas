@@ -542,7 +542,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
                             <br/>
                             <Typography variant="h4" component="h4" align="center">
-                                Declaracion Jurada de Síntomas de COVID-19
+                                Declaración Jurada de Síntomas de COVID-19
                             </Typography>                                
 
                             <Grid item sm={12}>
