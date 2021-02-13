@@ -120,7 +120,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
     const [noGuardado, setnoGuardado] = useState(false);
 
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
-    const [msj, setmsj] = useState("");
+    const [msj, setmsj] = useState({descripcion:"",tipo:"success"});
 
     //Datos de la pagina
     const [persona, setpersona] = useState({
@@ -279,7 +279,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         deporte_.tipo = Number(tipo_);
 
         console.log({persona: persona, deporte: deporte_, personas: jugadores})
-        
+        console.log(vacio)
         if(!vacio){
             if(tildado){
                 let personaObtenida = null;
@@ -307,7 +307,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
                     setcargandoSolicitar(false)
                 }else{
                     setcargandoSolicitar(false)
-                    setmsj('El DNI ingresado no se encuentra registrado, por favor, ingrese otro.')
+                    setmsj({descripcion:'El DNI ingresado no se encuentra registrado, por favor, ingrese otro.',tipo:"error"})
                     setabrirAlerta(true)
                 }   
             }else{
@@ -316,7 +316,10 @@ function Alerta({funcionAceptar, persona, deporte}) {
                 setcargandoSolicitar(false)
             }
         }else{
-            setmsj("Debe guardar los datos de los integrantes del equipo antes de realizar el turno.")
+            setcargandoSolicitar(false)
+            console.log("errpr")
+            setmsj({descripcion:"Debe guardar los datos de los integrantes del equipo antes de realizar el turno.",tipo:"warning"})
+            setabrirAlerta(true)
         }
     }
 
@@ -327,12 +330,12 @@ function Alerta({funcionAceptar, persona, deporte}) {
             if(tildado){
                 let respuesta = await axios.post(ruta+'/turno-deporte-creada',{persona: persona, deporte: deporte, personas: jugadores})
                 setcargandoSolicitar(false)
-                setmsj(respuesta.data.mensaje)
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }else{
                 let respuesta = await axios.post(ruta+'/turno-deporte-nueva',{persona: persona, deporte: deporte, personas: jugadores})
                 setcargandoSolicitar(false)
-                setmsj(respuesta.data.mensaje)
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }
         }else{

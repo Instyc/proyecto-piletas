@@ -117,7 +117,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
     
-    const [msj, setmsj] = useState("");
+    const [msj, setmsj] = useState({descripcion:"",tipo:"success"});
     
 
     //Datos de la pagina
@@ -173,7 +173,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     function modificarInput(e){
         if (msj!==""){
-            setmsj("")
+            setmsj({descripcion:"",tipo:"success"});
         }
         setpersona({
             ...persona,
@@ -239,7 +239,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                 setcargandoSolicitar(false)
             }else{
                 setcargandoSolicitar(false)
-                setmsj('El DNI ingresado no se encuentra registrado, por favor, ingrese otro.')
+                setmsj({descripcion:'El DNI ingresado no se encuentra registrado, por favor, ingrese otro.',tipo:"error"});
                 setabrirAlerta(true)
             }   
         }else{
@@ -256,12 +256,13 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             if(tildado){
                 let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona, turno: turno})
                 setcargandoSolicitar(false)
-                setmsj(respuesta.data.mensaje)
+
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }else{
                 let respuesta = await axios.post(ruta+'/turno-pileta-nueva',{persona: persona, turno: turno})
                 setcargandoSolicitar(false)
-                setmsj(respuesta.data.mensaje)
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }
         }else{
