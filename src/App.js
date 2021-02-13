@@ -16,9 +16,9 @@ import {Instagram, Facebook} from '@material-ui/icons';
 
 function App() {
   const classes = Estilos();
-  const ruta = "https://piletas-sb.herokuapp.com";
+  //const ruta = "https://piletas-sb.herokuapp.com";
   //const ruta = "https://8702aae9d9d1.ngrok.io";
-  //const ruta = "http://localhost:1337";
+  const ruta = "http://localhost:1337";
   const [copiado, setcopiado] = useState(false)
 
   const [usuario, setusuario] = useState({

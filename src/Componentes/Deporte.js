@@ -120,6 +120,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
     const [noGuardado, setnoGuardado] = useState(false);
 
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
+    const [msj, setmsj] = useState("");
 
     //Datos de la pagina
     const [persona, setpersona] = useState({
@@ -151,7 +152,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
         tipo: "Fútbol",
         horario: "0",
         nombre_equipo: "",
-        personas: []
     });
 
     useEffect(()=>{
@@ -184,15 +184,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
         });
     },[])
 
-    useEffect(()=>{
-        if (alertaDNI)
-            setalertaDNI(false)
-    },[tildado])
-
     function modificarInput(e){
-        if (alertaDNI){
-            setalertaDNI(false)
-        }
         setpersona({
             ...persona,
             [e.target.name]: e.target.value
@@ -273,163 +265,86 @@ function Alerta({funcionAceptar, persona, deporte}) {
             tipo: "Fútbol",
             horario: '0',
             nombre_equipo: "",
-            personas: []
         });
     }
 
-    function alertaPregunta(e){
+
+    async function alertaPregunta(e){
         e.preventDefault();
-        
         setcargandoSolicitar(true)
 
         let vacio = jugadores.some((jug)=> (jug.nombre==="" || jug.dni==="" || jug.apellido===""))
+        let tipo_ = deporte.tipo === "Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')
+        let deporte_ = deporte;
+        deporte_.tipo = Number(tipo_);
 
+        console.log({persona: persona, deporte: deporte_, personas: jugadores})
+        
         if(!vacio){
-            setnoGuardado(false)
+            if(tildado){
+                let personaObtenida = null;
+                try{
+                    personaObtenida = await axios.post(ruta+'/obtener-persona',{dni:persona.dni})
+                }catch(error){
 
-            axios.get(ruta+'/personas?dni='+persona.dni)
-            .then(response => {
-                if(response.data.length === 0 || tildado===true){
-                    if (tildado && response.data.length !== 0)
-                        setpersona({
-                            dni: response.data[0].dni,
-                            nombre: response.data[0].nombre,
-                            apellido: response.data[0].apellido,
-                            domicilio: response.data[0].domicilio,
-                            telefono: response.data[0].telefono,
-                            dni_alojado: response.data[0].dni_alojado,
-                            nombre_alojado: response.data[0].nombre_alojado,
-                            apellido_alojado: response.data[0].apellido_alojado,
-                            domicilio_alojado: response.data[0].domicilio_alojado,
-                        })
+                }
+
+                if(personaObtenida){
+                    personaObtenida = personaObtenida.data
+                    setpersona({
+                        dni: personaObtenida.dni,
+                        nombre: personaObtenida.nombre,
+                        apellido: personaObtenida.apellido,
+                        domicilio: personaObtenida.domicilio,
+                        telefono: personaObtenida.telefono,
+                        dni_alojado: personaObtenida.dni_alojado,
+                        nombre_alojado: personaObtenida.nombre_alojado,
+                        apellido_alojado: personaObtenida.apellido_alojado,
+                        domicilio_alojado: personaObtenida.domicilio_alojado,
+                    })
                     setcargandoSolicitar(false)
                     setabrirConfirmacion(true)
                     setcargandoSolicitar(false)
                 }else{
-                    setalertaDNI(true)
                     setcargandoSolicitar(false)
-                }
-    
-            }).catch(error => {
-                console.log(error.response)
-            });
+                    setmsj('El DNI ingresado no se encuentra registrado, por favor, ingrese otro.')
+                    setabrirAlerta(true)
+                }   
+            }else{
+                setcargandoSolicitar(false)
+                setabrirConfirmacion(true)
+                setcargandoSolicitar(false)
+            }
         }else{
-            setnoGuardado(true)
-            setcargandoSolicitar(false)
+            setmsj("Debe guardar los datos de los integrantes del equipo antes de realizar el turno.")
         }
     }
 
+    async function solicitarDeporte(boole){
+        setabrirConfirmacion(false)
+        setcargandoSolicitar(true)
+        if(boole){
+            if(tildado){
+                let respuesta = await axios.post(ruta+'/turno-deporte-creada',{persona: persona, deporte: deporte, personas: jugadores})
+                setcargandoSolicitar(false)
+                setmsj(respuesta.data.mensaje)
+                setabrirAlerta(true)
+            }else{
+                let respuesta = await axios.post(ruta+'/turno-deporte-nueva',{persona: persona, deporte: deporte, personas: jugadores})
+                setcargandoSolicitar(false)
+                setmsj(respuesta.data.mensaje)
+                setabrirAlerta(true)
+            }
+        }else{
+            setcargandoSolicitar(false)
+        }
+    }
+    
     function desplegarJugadores(cant){
         setjugadores([])
         setcantidadJugadores(cant)
         for (let i = 0; i < cant-1; i++) {
             setjugadores(elemento => [...elemento, jugador])
-        }
-    }
-
-    function solicitarDeporte(boole){
-        setabrirConfirmacion(false)
-        setcargandoSolicitar(true)
-        if(boole){
-            let aux = persona.domicilio
-            let persona_aux = persona
-            persona_aux.domicilio = aux;
-
-            axios.get(ruta+'/personas?dni='+persona.dni)
-            .then(async response => {
-                if(response.data.length === 0){
-
-                    axios.post(ruta+'/personas', persona_aux)
-                    .then(async response1 => {
-                        hacerDeporteTurno(response1.data)
-
-                    }).catch(error => {
-                        console.log(error.response)
-                    });
-                }else{
-                    let posicion = response.data[0].deportes.length;
-                    
-                    if(posicion!==0){
-                        posicion-=1
-                        
-                        let ultTurno = new Date(response.data[0].deportes[posicion].fecha+" 23:59:59");
-                        let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
-                        let dosDias = Date.parse(ultTurno) + 1000*60*60*36 //36 horas a milisegundos
-                        if (unDiaDespues>Date.now() && response.data[0].deportes.length!==0){
-                            setcargandoSolicitar(false)
-                            if (ultTurno<Date.now()){
-                                let permitido = new Date(dosDias)
-                                setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDate()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
-                            }else{
-                                let dia = ultTurno.getDate()
-                                let mes = ultTurno.getMonth() + 1
-                                let anio = ultTurno.getFullYear()
-
-                                if(mes < 10)
-                                    mes = "0"+mes
-                                if (dia <10)
-                                    dia = "0"+dia
-                                setmensaje("Usted tiene un turno activo para la fecha "+dia+"-"+mes+"-"+anio+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar")
-                            }
-                            setnotificar(true)
-                        }else{
-                            hacerDeporteTurno(response.data[0])
-                        }
-                    }else{
-                        hacerDeporteTurno(response.data[0])
-                    }
-                }
-            }).catch(error => {
-                setcargandoSolicitar(false)
-                console.log(error.response)
-            });
-        }else{
-            setcargandoSolicitar(false)
-        }
-    }
-
-    async function hacerDeporteTurno(response_data){
-        let deporte_aux = deporte;
-        deporte_aux.tipo = deporte.tipo==="Fútbol"?0:(deporte.tipo==="Voley"?1:2)
-        deporte_aux.personas.push(response_data.id);
-
-        let arr = await Promise.all(jugadores.map(async (integrante, i)=>{
-            try{
-                let response2 = await axios.get(ruta+'/personas?dni='+integrante.dni)
-                let integrante_aux = response2.data
-
-                if(response2.data.length === 0){
-                    let response3 = await axios.post(ruta+'/personas', integrante)
-                    
-                    deporte_aux.personas.push(response3.data.id)
-                    return response3.data.id
-                }else{
-                    deporte_aux.personas.push(response2.data[0].id)
-                    return response2.data[0].id
-                }
-            }catch(error){
-              console.log(error.response)
-            }
-        }))
-        
-        deporte_aux.horario = Number(deporte_aux.horario)
-        cargarDeporte(deporte_aux)
-    }
-
-    function cargarDeporte(depo){
-        if (depo!==null){
-            axios.post(ruta+'/deportes', depo)
-            .then(response => {
-                setcargandoSolicitar(false)
-                console.log("Después de cargar: ", response.data)
-                setabrirAlerta(true)
-                limpiarVariables()
-                setdisponibles(disponibles-1)
-                setjugadores([])
-            }).catch(error => {
-                setcargandoSolicitar(false)
-                console.log(error.response)
-            });
         }
     }
 
@@ -450,7 +365,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
             setesperaDisponible(false)
         }
     }
-    
     
     return (
         <div className={classes.fondo}>
@@ -748,14 +662,13 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                 <Button className={classes.botones} disabled={cargando || disponibles<=0} type="submit" size="large" variant="contained" style={{background:"lightgreen"}}>Solicitar</Button>
                             </Grid>
                         </Grid>
+
                         {abrirConfirmacion && <Alerta funcionAceptar={solicitarDeporte} persona={persona} deporte={deporte}/>}
+
                         {notificar && <Notificacion funcionAceptar={setnotificar} mensaje={mensaje}/>}
-                        <AlertaMensaje mensaje={"¡Turno creado exitosamente!"} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
+                        <AlertaMensaje mensaje={msj} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
                     </FormControl>
                 </form>
-                {alertaDNI && <Alert variant="filled" severity="error">
-                    El DNI ya se encuentra en uso, seleccione "Ya he realizado una reserva alguna vez" para continuar con la reserva.
-                </Alert>}
             </Paper>
         </div>
     )

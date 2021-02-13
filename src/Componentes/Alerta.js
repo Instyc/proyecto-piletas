@@ -17,7 +17,7 @@ export default function AlertaMensaje({mensaje, setabrir, abrir}) {
     return (
        <div>
            <Grid container>
-                <Snackbar open={abrir} autoHideDuration={4000} onClose={handleClose}>
+                <Snackbar open={abrir} autoHideDuration={8000} onClose={handleClose}>
                     <Alerta onClose={handleClose} severity="success">
                         {mensaje}
                     </Alerta>
