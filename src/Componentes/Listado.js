@@ -169,10 +169,8 @@ export default function Listado({ruta,usuario}) {
   const [auth, setauth] = useState('Bearer '+usuario.jwt);
   
   useEffect(()=>{
-    
     if(usuario.jwt!==""){
       let auth_init = 'Bearer '+usuario.jwt;
-
       let date_ = new Date();
       let mes = date_.getMonth() + 1
       if(mes < 10)
@@ -206,6 +204,7 @@ export default function Listado({ruta,usuario}) {
         var resultado = arregloAux.map(function(arreglo){
           return turnos_ordenados[arreglo.index];
         });
+        
         setturnos(resultado)
         setesperaDisponible(false)
       }).catch(error => {
@@ -289,7 +288,7 @@ export default function Listado({ruta,usuario}) {
         style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
         {esperaDisponible && <Cargando color="secondary"/>}
-        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
+        {turnos.length!==0?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
           <Typography align="justify" style={{fontWeight:"bold", padding:"10px"}}>
             Declaración Jurada de Síntomas de COVID-19 para personas que hayan solicitado un turno hace más de 72 horas: presione en "X" en el caso de que la persona en cuestión haya renovado su declaración jurada y asegure no poseer síntomas de COVID-19 al momento de asistir al complejo.
           </Typography>
@@ -308,7 +307,7 @@ export default function Listado({ruta,usuario}) {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>):(<Typography variant="h4"><br/>{mensaje}</Typography>)}
+        </TableContainer>):(<Typography variant="h4"><br/>No hay turnos para el día seleccionado.</Typography>)}
       </Paper>
     </div>
    

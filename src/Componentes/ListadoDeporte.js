@@ -219,7 +219,7 @@ export default function Listado({ruta,usuario}) {
         style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
         {esperaDisponible && <Cargando color="secondary"/>}
-        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
+        {deportes.length!==0?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
 
           <Table aria-label="collapsible table" style={{background:"rgba(0,0,0,.1)"}}>
             <TableHead>
@@ -235,7 +235,7 @@ export default function Listado({ruta,usuario}) {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>):(<Typography variant="h4"><br/>{mensaje}</Typography>)}
+        </TableContainer>):(<Typography variant="h4"><br/>No hay turnos para el día seleccionado.</Typography>)}
       </Paper>
     </div>
    
