@@ -107,7 +107,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
     const [tildado, settildado] = useState(false);
     const [mensaje, setmensaje] = useState("");
     const [tildadoCovid, settildadoCovid] = useState(false);
-    const [disponibles, setdisponibles] = useState(-1);
+    const [disponibles, setdisponibles] = useState(-3);
     const [esperaDisponible, setesperaDisponible] = useState(false);
     const [notificar, setnotificar] = useState(false);
     const [fechaHoy, setfechaHoy] = useState("");
