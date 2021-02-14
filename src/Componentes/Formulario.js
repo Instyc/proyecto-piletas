@@ -527,7 +527,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
                                 {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}
                                 {esperaDisponible && <LinearProgress color="secondary"/>}
-                                <Typography color="secondary"> {disponibles===-1?"0 lugares disponibles":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:`${disponibles} lugares disponibles`))} </Typography>
+                                <Typography color="secondary"> {disponibles===-1?"0 lugares disponibles":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"":`${disponibles} lugares disponibles`)))} </Typography>
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">

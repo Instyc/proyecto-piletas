@@ -661,7 +661,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
                             <Grid item lg={3} md={3} sm={12} xs={12} align="center">
                                 {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}
                                 {esperaDisponible && <LinearProgress color="secondary"/>}
-                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:`${disponibles} lugares disponibles`))} </Typography>
+                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"":`${disponibles} lugares disponibles`)))} </Typography>
                             </Grid>
 
                             {deporte.tipo!=='' && <Grid item lg={6} md={6} sm={12} xs={12} align="right">
