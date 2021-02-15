@@ -34,7 +34,7 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Los días habilitados para asistir al complejo son de martes a domingo.</li>
                             <li>Los horarios de apertura del complejo son: martes a viernes de 14 a 22 hs, sábados de 14 a 00 hs y domingos de 9:30 a 00 hs. El sector de las piletas cierra a las 20 hs.</li>
                             <li>Al momento de ingresar al complejo, deberás presentar tu DNI y un certificado de buena salud expedido por un organismo público.</li>
-                            <li>Luego de haber realizado una reserva, deberás esperar 24 horas para poder realizar otra.</li>
+                            <li>Luego de haber realizado una reserva, deberás esperar 24 horas luego de asistido al complejo para poder realizar otra. Solo se puede tener un turno activo a la vez.</li>
                             <li>La entrada al complejo es totalmente gratuita.</li>
                             <li>Para poder realizar una reserva, debés tener un domicilio real en San Bernardo que pueda ser comprobado mediante tu DNI.</li>
                             <li>En caso de no poseer un domicilio en San Bernardo y estar vacacionando en nuestra ciudad desde <strong>otra provincia</strong>, deberás presentar también una fotocopia del documento de la persona con la que te estás alojando.</li>
@@ -149,8 +149,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         if(dia < 10)
             dia = "0"+dia
         
-        //let fecha_ = date_.getFullYear()+"-"+mes+"-"+dia
-        let fecha_ = "2021-02-14"
+        let fecha_ = date_.getFullYear()+"-"+mes+"-"+dia
 
         setfechaHoy(fecha_)
         
@@ -160,13 +159,19 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         })
         setcargando(false)
         setesperaDisponible(true)
-        axios.get(ruta+'/turnos/count?fecha='+fecha_)
-        .then(response => {
-            setdisponibles(100-response.data)
+
+        if (date_.getUTCDay()!==1){
+            axios.get(ruta+'/turnos/count?fecha='+fecha_)
+            .then(response => {
+                setdisponibles(150-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }else{
+            setdisponibles(-2)//Cuando se selecciona un lunes
             setesperaDisponible(false)
-        }).catch(error => {
-            console.log(error.response)
-        });
+        }
     },[])
 
     useEffect(()=>{
@@ -339,7 +344,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         if (_fecha.getUTCDay()!==1){
             axios.get(ruta+'/turnos/count?fecha='+e.target.value)
             .then(response => {
-                setdisponibles(100-response.data)
+                setdisponibles(150-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
                 console.log(error.response)
