@@ -177,9 +177,10 @@ export default function Listado({ruta,usuario}) {
         dia = "0"+dia
     
     setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+    
 
     setesperaDisponible(true)
-    axios.get(ruta+'/turnos?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
+    axios.get(ruta+'/turnos?_limit=-1&fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
     .then(response => {
       let turnos_ordenados = response.data;
       // array temporal contiene objetos con posición y valor de ordenamiento
@@ -214,7 +215,7 @@ export default function Listado({ruta,usuario}) {
       setmensaje("")
     let _fecha = new Date(e.target.value)
     if (_fecha.getUTCDay()!==1){
-        axios.get(ruta+'/turnos?fecha='+e.target.value)
+        axios.get(ruta+'/turnos?_limit=-1&fecha='+e.target.value)
         .then(response => {
             setturnos([])
             let turnos_ordenados = response.data;
