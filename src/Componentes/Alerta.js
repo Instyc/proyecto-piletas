@@ -6,7 +6,7 @@ import {Snackbar, Grid} from '@material-ui/core';
 function Alerta(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
-export default function AlertaMensaje({mensaje, setabrir, abrir}) {
+export default function AlertaMensaje({mensaje, tipo, setabrir, abrir}) {
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -17,9 +17,9 @@ export default function AlertaMensaje({mensaje, setabrir, abrir}) {
     return (
        <div>
            <Grid container>
-                <Snackbar open={abrir} autoHideDuration={4000} onClose={handleClose}>
-                    <Alerta onClose={handleClose} severity="success">
-                        {mensaje}
+                <Snackbar open={abrir} autoHideDuration={8000} onClose={handleClose}>
+                    <Alerta onClose={handleClose} severity={mensaje.tipo}>
+                        {mensaje.descripcion}
                     </Alerta>
                 </Snackbar>
             </Grid>

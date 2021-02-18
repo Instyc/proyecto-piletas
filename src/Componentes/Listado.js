@@ -35,7 +35,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-function Row({turno, ruta, usuario}) {
+function Row({turno, ruta, usuario, cantidadAsistencia}) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [Turno, setTurno] = useState(turno);
@@ -52,7 +52,8 @@ function Row({turno, ruta, usuario}) {
   let auth = 'Bearer '+usuario.jwt;
 
   function asignarAsistencia(){
-    let asis = !Turno.asistencia;
+    let asis = !Turno.asistencia;    
+    
     axios.put(ruta+'/turnos/'+Turno.id,{
       asistencia: asis
     },{headers: {'Authorization': auth}})
@@ -61,6 +62,13 @@ function Row({turno, ruta, usuario}) {
         ...Turno,
         asistencia: !Turno.asistencia
       })
+
+      if (response.data.asistencia){
+        cantidadAsistencia(1)
+      }else{
+        cantidadAsistencia(-1)
+      }
+      
     }).catch(error => {
       console.log(error.response)
     });
@@ -166,47 +174,54 @@ export default function Listado({ruta,usuario}) {
   const [mensaje, setmensaje] = useState("");
   const [esperaDisponible, setesperaDisponible] = useState(false);
   const [turnos, setturnos] = useState([]);
-
+  const [auth, setauth] = useState('Bearer '+usuario.jwt);
+  const [asistido, setasistido] = useState(0);
+  
   useEffect(()=>{
-    let date_ = new Date();
-    let mes = date_.getMonth() + 1
-    if(mes < 10)
-        mes = "0"+mes
-    let dia = date_.getDate()
-    if(dia < 10)
-        dia = "0"+dia
-    
-    setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
-    
-
-    setesperaDisponible(true)
-    axios.get(ruta+'/turnos?_limit=-1&fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
-    .then(response => {
-      let turnos_ordenados = response.data;
-      // array temporal contiene objetos con posición y valor de ordenamiento
-      var arregloAux = turnos_ordenados.map(function(arreglo, i) {
-        return { index: i, value: arreglo.persona.apellido.toLowerCase() };
-      })
-      // ordenando el array mapeado que contiene los valores reducidos
-      arregloAux.sort(function(a, b) {
-        if (a.value > b.value) {
-          return 1;
-        }
-        if (a.value < b.value) {
-          return -1;
-        }
-        return 0;
-      });
-      // contenedor para el orden resultante
-      var resultado = arregloAux.map(function(arreglo){
-        return turnos_ordenados[arreglo.index];
-      });
-      setturnos(resultado)
-      setesperaDisponible(false)
-    }).catch(error => {
+    if(usuario.jwt!==""){
+      let auth_init = 'Bearer '+usuario.jwt;
+      let date_ = new Date();
+      let mes = date_.getMonth() + 1
+      if(mes < 10)
+          mes = "0"+mes
+      let dia = date_.getDate()
+      if(dia < 10)
+          dia = "0"+dia
+      
+      setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+      
+      setesperaDisponible(true)
+      axios.get(ruta+'/turnos?_limit=-1&fecha='+date_.getFullYear()+"-"+mes+"-"+dia,
+      {headers: {'Authorization': auth_init}})
+      .then(response => {
+        let turnos_ordenados = response.data;
+        // array temporal contiene objetos con posición y valor de ordenamiento
+        var arregloAux = turnos_ordenados.map(function(arreglo,i) {
+          return { index: i, value: arreglo.persona.apellido.toLowerCase() };
+        })
+        // ordenando el array mapeado que contiene los valores reducidos
+        arregloAux.sort(function(a, b) {
+          if (a.value > b.value) {
+            return 1;
+          }
+          if (a.value < b.value) {
+            return -1;
+          }
+          return 0;
+        });
+        // contenedor para el orden resultante
+        var resultado = arregloAux.map(function(arreglo){
+          return turnos_ordenados[arreglo.index];
+        });
+        
+        setturnos(resultado)
+        setesperaDisponible(false)
+      }).catch(error => {
         console.log(error.response)
-    });
-  },[])
+        setesperaDisponible(false)
+      });
+    }
+  },[usuario])
 
   function seleccionarFecha(e){
     setesperaDisponible(true)
@@ -215,7 +230,8 @@ export default function Listado({ruta,usuario}) {
       setmensaje("")
     let _fecha = new Date(e.target.value)
     if (_fecha.getUTCDay()!==1){
-        axios.get(ruta+'/turnos?_limit=-1&fecha='+e.target.value)
+        axios.get(ruta+'/turnos?_limit=-1&fecha='+e.target.value,
+        {headers: {'Authorization': auth}})
         .then(response => {
             setturnos([])
             let turnos_ordenados = response.data;
@@ -243,12 +259,22 @@ export default function Listado({ruta,usuario}) {
             setesperaDisponible(false)
         }).catch(error => {
             console.log(error.response)
+            setesperaDisponible(false)
         });
     }else{
         setturnos([])
         setmensaje("Los días lunes no se pueden realizar reservas.")
         setesperaDisponible(false)
     }
+  }
+
+  useEffect(()=>{
+    let asist = turnos.filter((turno)=>turno.asistencia===true)
+    setasistido(asist.length)
+  },[turnos])
+
+  function cantidadAsistencia(valor){
+    setasistido(asistido+valor)
   }
 
   return (
@@ -280,9 +306,17 @@ export default function Listado({ruta,usuario}) {
         style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
         {esperaDisponible && <Cargando color="secondary"/>}
-        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
+        {turnos.length!==0?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
           <Typography align="justify" style={{fontWeight:"bold", padding:"10px"}}>
             Declaración Jurada de Síntomas de COVID-19 para personas que hayan solicitado un turno hace más de 72 horas: presione en "X" en el caso de que la persona en cuestión haya renovado su declaración jurada y asegure no poseer síntomas de COVID-19 al momento de asistir al complejo.
+          </Typography>
+
+          <Typography align="justify" style={{padding:"10px"}}>
+            Cantidad de turnos para el día seleccionado: {turnos.length}
+          </Typography>
+
+          <Typography align="justify" style={{padding:"10px"}}>
+            Cantidad de personas asistidas: {asistido}
           </Typography>
 
           <Table aria-label="collapsible table" style={{background:"rgba(0,0,0,.1)"}}>
@@ -295,11 +329,11 @@ export default function Listado({ruta,usuario}) {
             </TableHead>
             <TableBody>
               {turnos.map((turno,i) => (
-                <Row key={i} turno={turno} ruta={ruta} usuario={usuario}/>
+                <Row key={i} turno={turno} ruta={ruta} usuario={usuario} cantidadAsistencia={cantidadAsistencia}/>
               ))}
             </TableBody>
           </Table>
-        </TableContainer>):(<Typography variant="h4"><br/>{mensaje}</Typography>)}
+        </TableContainer>):(<Typography variant="h4"><br/>No hay turnos para el día seleccionado.</Typography>)}
       </Paper>
     </div>
    

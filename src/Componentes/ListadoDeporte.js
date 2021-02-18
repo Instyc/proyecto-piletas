@@ -134,28 +134,35 @@ export default function Listado({ruta,usuario}) {
   const [mensaje, setmensaje] = useState("");
   const [esperaDisponible, setesperaDisponible] = useState(false);
   const [deportes, setdeportes] = useState([]);
+  const [auth, setauth] = useState('Bearer '+usuario.jwt);
 
   useEffect(()=>{
-    let date_ = new Date();
-    let mes = date_.getMonth() + 1
-    if(mes < 10)
-        mes = "0"+mes
-    let dia = date_.getDate()
-    if(dia < 10)
-        dia = "0"+dia
-    
-    setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+    if(usuario.jwt!==""){
+      let auth_init = 'Bearer '+usuario.jwt;
 
-    setesperaDisponible(true)
-    axios.get(ruta+'/deportes?fecha='+date_.getFullYear()+"-"+mes+"-"+dia)
-    .then(response => {
-        setdeportes([])
-        setdeportes(response.data)
-        setesperaDisponible(false)
-    }).catch(error => {
-        console.log(error.response)
-    });
-  },[])
+      let date_ = new Date();
+      let mes = date_.getMonth() + 1
+      if(mes < 10)
+          mes = "0"+mes
+      let dia = date_.getDate()
+      if(dia < 10)
+          dia = "0"+dia
+      
+      setfechaHoy(date_.getFullYear()+"-"+mes+"-"+dia)
+
+      setesperaDisponible(true)
+      axios.get(ruta+'/deportes?fecha='+date_.getFullYear()+"-"+mes+"-"+dia,
+      {headers: {'Authorization': auth_init}})
+      .then(response => {
+          setdeportes([])
+          setdeportes(response.data)
+          setesperaDisponible(false)
+      }).catch(error => {
+          console.log(error.response)
+          setesperaDisponible(false)
+      });
+    }
+  },[usuario])
 
   function seleccionarFecha(e){
     setesperaDisponible(true)
@@ -164,7 +171,8 @@ export default function Listado({ruta,usuario}) {
       setmensaje("")
     let _fecha = new Date(e.target.value)
     if (_fecha.getUTCDay()!==1){
-        axios.get(ruta+'/deportes?fecha='+e.target.value)
+        axios.get(ruta+'/deportes?fecha='+e.target.value,
+        {headers: {'Authorization': auth}})
         .then(response => {
             setdeportes([])
             setdeportes(response.data)
@@ -173,6 +181,7 @@ export default function Listado({ruta,usuario}) {
             setesperaDisponible(false)
         }).catch(error => {
             console.log(error.response)
+            setesperaDisponible(false)
         });
     }else{
         setdeportes([])
@@ -210,7 +219,7 @@ export default function Listado({ruta,usuario}) {
         style={{boxSizing: "border-box", padding:"0px 15px", fontSize:"15px", background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
 
         {esperaDisponible && <Cargando color="secondary"/>}
-        {mensaje===""?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
+        {deportes.length!==0?(<TableContainer component={Paper} style={{maxWidth:"1000px",margin:"10px auto", background:"rgba(0,0,0,0)"}}>
 
           <Table aria-label="collapsible table" style={{background:"rgba(0,0,0,.1)"}}>
             <TableHead>
@@ -226,7 +235,7 @@ export default function Listado({ruta,usuario}) {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>):(<Typography variant="h4"><br/>{mensaje}</Typography>)}
+        </TableContainer>):(<Typography variant="h4"><br/>No hay turnos para el día seleccionado.</Typography>)}
       </Paper>
     </div>
    

@@ -105,7 +105,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     const [cargando, setcargando] = useState(false);
     const [abrirConfirmacion, setabrirConfirmacion] = useState(false);
-    const [alertaDNI, setalertaDNI] = useState(false);
     const [tildado, settildado] = useState(false);
     const [mensaje, setmensaje] = useState("");
     const [tildadoCovid, settildadoCovid] = useState(false);
@@ -117,6 +116,9 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const [abrirAlerta, setabrirAlerta] = useState(false);
 
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
+    
+    const [msj, setmsj] = useState({descripcion:"",tipo:"success"});
+    
 
     //Datos de la pagina
     const [persona, setpersona] = useState({
@@ -174,15 +176,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         }
     },[])
 
-    useEffect(()=>{
-        if (alertaDNI)
-            setalertaDNI(false)
-    },[tildado])
-
     function modificarInput(e){
-        if (alertaDNI){
-            setalertaDNI(false)
-        }
         setpersona({
             ...persona,
             [e.target.name]: e.target.value
@@ -218,124 +212,73 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         });
     }
 
-    function alertaPregunta(e){
+    async function alertaPregunta(e){
         e.preventDefault();
         setcargandoSolicitar(true)
+        if(tildado){
+            let personaObtenida = null;
+            try{
+                personaObtenida = await axios.post(ruta+'/obtener-persona',{dni:persona.dni})
+            }catch(error){
 
-        axios.get(ruta+'/personas?dni='+persona.dni)
-        .then(response => {
-            if(response.data.length === 0 || tildado===true){
-                if (tildado && response.data.length !== 0)
-                    setpersona({
-                        dni: response.data[0].dni,
-                        nombre: response.data[0].nombre,
-                        apellido: response.data[0].apellido,
-                        domicilio: response.data[0].domicilio,
-                        telefono: response.data[0].telefono,
-                        dni_alojado: response.data[0].dni_alojado,
-                        nombre_alojado: response.data[0].nombre_alojado,
-                        apellido_alojado: response.data[0].apellido_alojado,
-                        domicilio_alojado: response.data[0].domicilio_alojado,
-                    })
+            }
+            if(personaObtenida){
+                personaObtenida = personaObtenida.data
+                setpersona({
+                    dni: personaObtenida.dni,
+                    nombre: personaObtenida.nombre,
+                    apellido: personaObtenida.apellido,
+                    domicilio: personaObtenida.domicilio,
+                    telefono: personaObtenida.telefono,
+                    dni_alojado: personaObtenida.dni_alojado,
+                    nombre_alojado: personaObtenida.nombre_alojado,
+                    apellido_alojado: personaObtenida.apellido_alojado,
+                    domicilio_alojado: personaObtenida.domicilio_alojado,
+                })
                 setcargandoSolicitar(false)
                 setabrirConfirmacion(true)
                 setcargandoSolicitar(false)
             }else{
-                setalertaDNI(true)
                 setcargandoSolicitar(false)
-            }
-
-        }).catch(error => {
-            console.log(error.response)
-        });
+                setmsj({descripcion:'El DNI ingresado no se encuentra registrado, por favor ingrese sus datos.',tipo:"error"});
+                setabrirAlerta(true)
+            }   
+        }else{
+            setcargandoSolicitar(false)
+            setabrirConfirmacion(true)
+            setcargandoSolicitar(false)
+        }
     }
 
-    function solicitarTurno(boole){
+    async function solicitarTurno(boole){
         setabrirConfirmacion(false)
         setcargandoSolicitar(true)
         if(boole){
-            let aux = persona.domicilio
-            let persona_aux = persona;
-            persona_aux.domicilio = aux;
-
-            axios.get(ruta+'/personas?dni='+persona.dni)
-            .then(response => {
-                if(response.data.length === 0){
-                    axios.post(ruta+'/personas', persona_aux)
-                    .then(response => {
-                        let turno_aux = turno;
-                        turno_aux.persona = response.data.id;
-                        
-                        axios.post(ruta+'/turnos', turno_aux)
-                        .then(response => {
-                            setcargandoSolicitar(false)
-                            setabrirAlerta(true)
-                            limpiarVariables()
-                            setdisponibles(disponibles-1)
-                        }).catch(error => {
-                            console.log(error.response)
-                        });
-
-                    }).catch(error => {
-                        console.log(error.response)
-                    });
-                }else{
-                    let turno_aux = turno;
-                    turno_aux.persona = response.data[0].id;
-
-                    let posicion = response.data[0].turnos.length
-                    
-                    if (posicion!==0){
-                        posicion-=1
-                        let ultTurno = new Date(response.data[0].turnos[posicion].fecha+" 23:59:59");
-                        let unDiaDespues = Date.parse(ultTurno) + 1000*60*60*24 //24 horas a milisegundos
-                        let dosDias = Date.parse(ultTurno) + 1000*60*60*36 //36 horas a milisegundos
-                        
-                        if (unDiaDespues>Date.now() && response.data[0].turnos.length!==0){
-                            setcargandoSolicitar(false)
-                            if (ultTurno<Date.now()){
-                                let permitido = new Date(dosDias)
-                                setmensaje("Debido a su último turno expedido, puede volver a realizar una reserva el día "+permitido.getDate()+"/"+(permitido.getMonth()+1)+"/"+permitido.getFullYear())
-                            }else{
-                                let dia = ultTurno.getDate()
-                                let mes = ultTurno.getMonth() + 1
-                                let anio = ultTurno.getFullYear()
-    
-                                if(mes < 10)
-                                    mes = "0"+mes
-                                if (dia <10)
-                                    dia = "0"+dia
-                                setmensaje("Usted tiene un turno activo para la fecha "+dia+"-"+mes+"-"+anio+". Si desea cancelarlo, comuníquese al correo complejodeportivosb@gmail.com.ar adjuntado sus datos y una foto del frente y dorso de su documento.")
-                            }
-                            setnotificar(true)
-                        }else{
-                            hacerPiletaTurno(turno_aux)
-                        }
-                    }else{
-                        hacerPiletaTurno(turno_aux)
-                    }
-                }
-            }).catch(error => {
+            if(tildado){
+                let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona, turno: turno})
                 setcargandoSolicitar(false)
-                console.log(error.response)
-            });
+                
+                if(respuesta.data.tipo==="success"){
+                    limpiarVariables();
+                }
+
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
+                setabrirAlerta(true)
+            }else{
+                let respuesta = await axios.post(ruta+'/turno-pileta-nueva',{persona: persona, turno: turno})
+
+                setcargandoSolicitar(false)
+                if(respuesta.data.tipo==="success"){
+                    limpiarVariables();
+                }
+                setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
+                setabrirAlerta(true)
+            }
         }else{
             setcargandoSolicitar(false)
         }
     }
 
-    function hacerPiletaTurno(turno_aux){
-        axios.post(ruta+'/turnos', turno_aux)
-        .then(response => {
-            setcargandoSolicitar(false)
-            setabrirAlerta(true)
-            limpiarVariables()
-            setdisponibles(disponibles-1)
-        }).catch(error => {
-            setcargandoSolicitar(false)
-            console.log(error.response)
-        });
-    }
 
     function seleccionarFecha(e){
         setturno({...turno, fecha: e.target.value})
@@ -354,7 +297,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             setesperaDisponible(false)
         }
     }
-    
     
     return (
         <div className={classes.fondo}>
@@ -578,6 +520,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             <Grid item xs={12} align="center" style={{margin:"15px"}}>
                                 {cargandoSolicitar && <LinearProgress color="secondary"/>}
                             </Grid>
+
                             <Grid item xs={6} align="center">
                                 <Button className={classes.botones} onClick={()=>{setsiguiente(false)}} size="large" variant="contained" color="secondary">Atras</Button>
                             </Grid>
@@ -588,12 +531,11 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         </Grid>
                         {abrirConfirmacion && <Alerta funcionAceptar={solicitarTurno} persona={persona} turno={turno}/>}
                         {notificar && <Notificacion funcionAceptar={setnotificar} mensaje={mensaje}/>}
-                        <AlertaMensaje mensaje={"¡Turno creado exitosamente!"} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
+
+                        <AlertaMensaje mensaje={msj} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
                     </FormControl>
                 </form>
-                {alertaDNI && <Alert variant="filled" severity="error">
-                    El DNI ya se encuentra en uso, seleccione "Ya he realizado una reserva alguna vez" para continuar con la reserva.
-                </Alert>}
+                
             </Paper>
         </div>
     )
