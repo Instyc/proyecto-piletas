@@ -256,12 +256,23 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             if(tildado){
                 let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona, turno: turno})
                 setcargandoSolicitar(false)
+                
+                if(respuesta.data.tipo==="success"){
+                    limpiarVariables();
+                }
 
+                console.log({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo})
                 setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }else{
                 let respuesta = await axios.post(ruta+'/turno-pileta-nueva',{persona: persona, turno: turno})
+
                 setcargandoSolicitar(false)
+                if(respuesta.data.tipo==="success"){
+                    limpiarVariables();
+                }
+
+                console.log({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo})
                 setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }
