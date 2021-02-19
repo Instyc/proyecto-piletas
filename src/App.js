@@ -62,9 +62,11 @@ function App() {
         <Nav setusuario={setusuario} usuario={usuario}/>
         <Switch>
           {/*<Route exact path={"/"}><Formulario ruta={ruta}/></Route>*/}
-          <Route exact path={"/"}><div className={classes.fondo2} style={{margin:"auto"}}>
-              <img src="mantenimiento.png" alt=""></img>
-            </div></Route>
+          <Route exact path={"/"}>
+            <div className={classes.fondo2} style={{margin:"auto"}}>
+              <img src="mantenimiento.png" width="100%" alt=""></img>
+            </div>
+          </Route>
           <Route exact path={"/deporte"}><Deporte ruta={ruta}/></Route>
           <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
