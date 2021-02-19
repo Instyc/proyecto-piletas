@@ -61,18 +61,18 @@ function App() {
       <Router basename={process.env.PUBLIC_URL}>
         <Nav setusuario={setusuario} usuario={usuario}/>
         <Switch>
-          {/*<Route exact path={"/"}><Formulario ruta={ruta}/></Route>*/}
-          <Route exact path={"/"}>
+          <Route exact path={"/"}><Formulario ruta={ruta}/></Route>
+          {/*<Route exact path={"/"}>
             <div className={classes.fondo2} style={{margin:"auto"}}>
               <img src="mantenimiento.png" width="100%" alt=""></img>
             </div>
-          </Route>
+          </Route>*/}
           <Route exact path={"/deporte"}><Deporte ruta={ruta}/></Route>
           <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
           <Route path={"/listarDeporte"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<ListadoDeporte usuario={usuario} ruta={ruta}/>}</Route>
           <Route>
-            <div className={classes.fondo2} style={{margin:"auto"}}>
+            <div className={classes.fondo2} width="100%" style={{margin:"auto"}}>
               <img src="404.png" alt=""></img>
             </div>
           </Route>
