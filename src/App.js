@@ -72,8 +72,8 @@ function App() {
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
           <Route path={"/listarDeporte"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<ListadoDeporte usuario={usuario} ruta={ruta}/>}</Route>
           <Route>
-            <div className={classes.fondo2} width="100%" style={{margin:"auto"}}>
-              <img src="404.png" alt=""></img>
+            <div className={classes.fondo2} style={{margin:"auto"}}>
+              <img src="404.png" width="100%" alt=""></img>
             </div>
           </Route>
         </Switch>

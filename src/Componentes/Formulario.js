@@ -177,10 +177,44 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     },[])
 
     function modificarInput(e){
-        setpersona({
-            ...persona,
-            [e.target.name]: e.target.value
-        })
+        switch (e.target.name) {
+            case "dni":
+                if (e.target.value>=0 && e.target.value<=99999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            case "dni_alojado":
+                if (e.target.value>=0 && e.target.value<=99999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            case "telefono":
+                if (e.target.value>=0 && e.target.value<=9999999999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            default:
+                setpersona({
+                    ...persona,
+                    [e.target.name]: e.target.value
+                })
+                break;
+        }
     }
 
     function seleccionarArea(e){
@@ -332,7 +366,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 className={classes.inputAncho}
                                 id="filled-basic"
                                 label="DNI"
-                                type="number"
                                 variant="filled"
                                 maxLength={50}
                                 required/>
@@ -373,7 +406,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                     className={classes.inputAncho}
                                     id="filled-basic"
                                     label="Número de celular"
-                                    type="number"
                                     variant="filled"
                                     maxLength={50}
                                 />
@@ -410,7 +442,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                     className={classes.inputAncho}
                                     id="filled-basic"
                                     label="DNI"
-                                    type="number"
                                     variant="filled"
                                     maxLength={50}
                                     required/>

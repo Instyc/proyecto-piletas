@@ -184,10 +184,44 @@ function Alerta({funcionAceptar, persona, deporte}) {
     },[])
 
     function modificarInput(e){
-        setpersona({
-            ...persona,
-            [e.target.name]: e.target.value
-        })
+        switch (e.target.name) {
+            case "dni":
+                if (e.target.value>=0 && e.target.value<=99999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            case "dni_alojado":
+                if (e.target.value>=0 && e.target.value<=99999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            case "telefono":
+                if (e.target.value>=0 && e.target.value<=9999999999999){
+                    let aux = e.target.value.replace(".", "")
+                    aux = aux.replace(" ", "")
+                    setpersona({
+                        ...persona,
+                        [e.target.name]: aux
+                    })
+                }
+                break;
+            default:
+                setpersona({
+                    ...persona,
+                    [e.target.name]: e.target.value
+                })
+                break;
+        }
     }
     
     function inputDeporte(e){
@@ -416,7 +450,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                 className={classes.inputAncho}
                                 id="filled-basic"
                                 label="DNI"
-                                type="number"
                                 variant="filled"
                                 maxLength={50}
                                 required/>
@@ -456,7 +489,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                     className={classes.inputAncho}
                                     id="filled-basic"
                                     label="Número de celular"
-                                    type="number"
                                     variant="filled"
                                     maxLength={50}
                                 />
@@ -493,7 +525,6 @@ function Alerta({funcionAceptar, persona, deporte}) {
                                     className={classes.inputAncho}
                                     id="filled-basic"
                                     label="DNI"
-                                    type="number"
                                     variant="filled"
                                     maxLength={50}
                                     required/>
@@ -691,8 +722,36 @@ const Integrante = React.memo(({integrante, i, guardarIntegrante}) =>{
     const [guardar, setguardar] = useState(false);
 
     function inputJugadores(e){
-        if(!guardar)setdatosIntegrante({...datosIntegrante, [e.target.name]: e.target.value})
+        if (!guardar){
+            switch (e.target.name) {
+                case "dni":
+                    if (e.target.value>=0 && e.target.value<=99999999){
+                        let aux = e.target.value.replace(".", "")
+                        aux = aux.replace(" ", "")
+                        setdatosIntegrante({...datosIntegrante, [e.target.name]: aux})
+                    }
+                    break;
+                case "dni_alojado":
+                    if (e.target.value>=0 && e.target.value<=99999999){
+                        let aux = e.target.value.replace(".", "")
+                        aux = aux.replace(" ", "")
+                        setdatosIntegrante({...datosIntegrante, [e.target.name]: aux})
+                    }
+                    break;
+                case "telefono":
+                    if (e.target.value>=0 && e.target.value<=9999999999999){
+                        let aux = e.target.value.replace(".", "")
+                        aux = aux.replace(" ", "")
+                        setdatosIntegrante({...datosIntegrante, [e.target.name]: aux})
+                    }
+                    break;
+                default:
+                    setdatosIntegrante({...datosIntegrante, [e.target.name]: e.target.value})
+                    break;
+            }
+        }
     }
+
     function guardarDatos(){
         if(guardar){
             setguardar(false)
@@ -727,7 +786,6 @@ const Integrante = React.memo(({integrante, i, guardarIntegrante}) =>{
                 className={classes.inputAncho}
                 id="filled-basic"
                 label="DNI"
-                type="number"
                 variant="filled"
                 maxLength={50}
                 required
@@ -770,7 +828,6 @@ const Integrante = React.memo(({integrante, i, guardarIntegrante}) =>{
                     className={classes.inputAncho}
                     id="filled-basic"
                     label="Número de celular"
-                    type="number"
                     variant="filled"
                     maxLength={50}
                 />
@@ -807,7 +864,6 @@ const Integrante = React.memo(({integrante, i, guardarIntegrante}) =>{
                     className={classes.inputAncho}
                     id="filled-basic"
                     label="DNI"
-                    type="number"
                     variant="filled"
                     maxLength={50}
                     required
