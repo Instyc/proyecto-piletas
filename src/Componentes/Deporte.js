@@ -364,9 +364,9 @@ function Alerta({funcionAceptar, persona, deporte}) {
                 let respuesta = await axios.post(ruta+'/turno-deporte-creada',{persona: persona, deporte: deporte_, personas: jugadores})
                 setcargandoSolicitar(false)
                 if (respuesta.data.tipo==="success"){
-                    limpiarVariables()
                     setdisponibles(disponibles-1)
                 }
+                limpiarVariables()
                 setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }else{

@@ -19,6 +19,7 @@ function App() {
   const ruta = "https://piletas-sb.herokuapp.com";
   //const ruta = "https://8702aae9d9d1.ngrok.io";
   //const ruta = "http://localhost:1337";
+  const mantenimiento = true
   const [copiado, setcopiado] = useState(false)
 
   const [usuario, setusuario] = useState({
@@ -61,13 +62,18 @@ function App() {
       <Router basename={process.env.PUBLIC_URL}>
         <Nav setusuario={setusuario} usuario={usuario}/>
         <Switch>
-          <Route exact path={"/"}><Formulario ruta={ruta}/></Route>
-          {/*<Route exact path={"/"}>
+          {!mantenimiento && <Route exact path={"/"}><Formulario ruta={ruta}/></Route>}
+          {mantenimiento && <Route exact path={"/"}>
             <div className={classes.fondo2} style={{margin:"auto"}}>
               <img src="mantenimiento.png" width="100%" alt=""></img>
             </div>
-          </Route>*/}
-          <Route exact path={"/deporte"}><Deporte ruta={ruta}/></Route>
+          </Route>}
+          {!mantenimiento && <Route exact path={"/deporte"}><Deporte ruta={ruta}/></Route>}
+          {mantenimiento && <Route exact path={"/deporte"}>
+            <div className={classes.fondo2} style={{margin:"auto"}}>
+              <img src="mantenimiento.png" width="100%" alt=""></img>
+            </div>
+          </Route>}
           <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
           <Route path={"/listarDeporte"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<ListadoDeporte usuario={usuario} ruta={ruta}/>}</Route>

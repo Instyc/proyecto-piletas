@@ -71,14 +71,15 @@ function Alerta({funcionAceptar, persona, turno}) {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{noEsta?"DNI no encontrado":"Por favor, confirme que sus datos sean correctos"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{noEsta?"DNI no encontrado":"Por favor, confirme que los datos sean correctos"}</DialogTitle>
           <DialogContent>
             {!noEsta && <DialogContentText id="alert-dialog-description">
                 Nombre: {persona.nombre}<br/>
                 Apellido: {persona.apellido}<br/>
                 DNI: {persona.dni}<br/>
                 Telefono: {persona.telefono}<br/>
-                {persona.domicilio?"Situación: Soy turista":"Localidad: San Bernardo"}<br/>
+                {(persona.domicilio==="Turista" || persona.domicilio===true)?"Situación: Soy turista":
+                ((persona.domicilio==="San Bernardo" || persona.domicilio===false)?"Localidad: San Bernardo":"Localidad: "+persona.domicilio_alojado)}<br/>
                 Fecha reservada: {turno.fecha}<br/>
                 Área: {turno.area===0?"Pileta":(turno.area===1?"Camping":"Camping y pileta")}
             </DialogContentText>}
@@ -114,6 +115,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const [fechaHoy, setfechaHoy] = useState("");
     const [turista, setturista] = useState(false);
     const [abrirAlerta, setabrirAlerta] = useState(false);
+    const [checkedLocalidad, setcheckedLocalidad] = useState(false);
 
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
     
@@ -136,6 +138,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const [turno, setturno] = useState({
         fecha: "",
         area: 2,
+        tipo: 0,
         asistencia: false,
         declarado: false,
         persona: null
@@ -163,7 +166,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         setesperaDisponible(true)
 
         if (date_.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+fecha_)
+            axios.get(ruta+'/turnos/count?fecha='+fecha_+'&tipo=0')
             .then(response => {
                 setdisponibles(150-response.data)
                 setesperaDisponible(false)
@@ -224,6 +227,15 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         })
     }
 
+    useEffect(()=>{
+        if (persona.domicilio==="Turista" || persona.domicilio==="Localidad"){
+            setpersona({
+                ...persona,
+                domicilio_alojado: ''
+            })
+        }
+    },[persona.domicilio])
+
     function limpiarVariables(){
         setpersona({
             dni: "",
@@ -236,15 +248,18 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             apellido_alojado: "",
             domicilio_alojado: ""
         });
-
+        setturista(false)
         setturno({
             fecha: turno.fecha,
             area: 2,
+            tipo: 0,
             asistencia: false,
             declarado: false,
             persona: null
         });
     }
+
+     
 
     async function alertaPregunta(e){
         e.preventDefault();
@@ -287,41 +302,106 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     async function solicitarTurno(boole){
         setabrirConfirmacion(false)
         setcargandoSolicitar(true)
+        let domicilio_ = persona.domicilio==="San Bernardo"?false:(persona.domicilio==="Turista"?true:null)
+        let persona_ = {...persona};
+        persona_.domicilio = domicilio_
         if(boole){
             if(tildado){
-                let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona, turno: turno})
+                let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona_, turno: turno})
                 setcargandoSolicitar(false)
                 
                 if(respuesta.data.tipo==="success"){
-                    limpiarVariables();
+                    setdisponibles(disponibles-1)
                 }
-
+                
+                limpiarVariables();
                 setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }else{
-                let respuesta = await axios.post(ruta+'/turno-pileta-nueva',{persona: persona, turno: turno})
+                let respuesta = await axios.post(ruta+'/turno-pileta-nueva',{persona: persona_, turno: turno})
 
                 setcargandoSolicitar(false)
                 if(respuesta.data.tipo==="success"){
                     limpiarVariables();
+                    setdisponibles(disponibles-1)
                 }
                 setmsj({descripcion:respuesta.data.mensaje,tipo:respuesta.data.tipo});
                 setabrirAlerta(true)
             }
         }else{
+            limpiarVariables()
             setcargandoSolicitar(false)
         }
     }
 
+    function otraLocalidad(identificador){
+        setesperaDisponible(true)
+        //0: San Bernardo, 1: Turista, 2: Otra localidad
+        setturista(identificador===1)
+        let tipo_ = identificador===2?1:0
+        let _fecha = new Date(turno.fecha)
+        setturno({...turno, tipo: tipo_})
+        if (_fecha.getUTCDay()!==1){
+            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+tipo_)
+            .then(response => {
+                tipo_===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }else{
+            setdisponibles(-2)//Cuando se selecciona un lunes
+            setesperaDisponible(false)
+        }
+    }
 
     function seleccionarFecha(e){
         setturno({...turno, fecha: e.target.value})
         setesperaDisponible(true)
         let _fecha = new Date(e.target.value)
+        let _tipo = turno.tipo
         if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+e.target.value)
+            axios.get(ruta+'/turnos/count?fecha='+e.target.value+'&tipo='+_tipo)
             .then(response => {
-                setdisponibles(150-response.data)
+                _tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }else{
+            setdisponibles(-2)//Cuando se selecciona un lunes
+            setesperaDisponible(false)
+        }
+    }
+
+    function reservaAlgunaVez(){
+        settildado(!tildado)
+        setesperaDisponible(true)
+        let _fecha = new Date(turno.fecha)
+        setcheckedLocalidad(turno.tipo===1)
+        if (_fecha.getUTCDay()!==1){
+            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+turno.tipo)
+            .then(response => {
+                turno.tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }else{
+            setdisponibles(-2)//Cuando se selecciona un lunes
+            setesperaDisponible(false)
+        }
+    }
+
+    function metodoLocalidad(){
+        setcheckedLocalidad(!checkedLocalidad)
+        setesperaDisponible(true)
+        let _fecha = new Date(turno.fecha)
+        let _tipo = checkedLocalidad?0:1
+        if (_fecha.getUTCDay()!==1){
+            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+_tipo)
+            .then(response => {
+                _tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
                 setesperaDisponible(false)
             }).catch(error => {
                 console.log(error.response)
@@ -349,7 +429,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 control={
                                     <Checkbox
                                         checked={tildado}
-                                        onChange={()=>{settildado(!tildado)}}
+                                        onChange={reservaAlgunaVez}
                                         name="checkedF"
                                         color="primary"
                                     />
@@ -422,10 +502,24 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                         variant="filled"
                                         required
                                     >
-                                        <MenuItem value={false} onClick={()=>setturista(false)}>San Bernardo</MenuItem>
-                                        <MenuItem value={true} onClick={()=>setturista(true)}>Soy turista</MenuItem>
+                                        <MenuItem value={"San Bernardo"} onClick={()=>{otraLocalidad(0)}}>San Bernardo</MenuItem>
+                                        <MenuItem value={"Turista"} onClick={()=>{otraLocalidad(1)}}>Soy turista</MenuItem>
+                                        <MenuItem value={"Localidad"} onClick={()=>{otraLocalidad(2)}}>Soy de otra localidad</MenuItem>
                                     </Select>
                                 </FormControl>
+                            </Grid>}
+
+                            {persona.domicilio==="Localidad" && !tildado && <Grid item lg={2} md={2} sm={12} xs={12}>
+                                <TextField
+                                onChange={modificarInput}
+                                value={persona.domicilio_alojado}
+                                name="domicilio_alojado"
+                                className={classes.inputAncho}
+                                id="filled-basic"
+                                label="Localidad"
+                                variant="filled"
+                                maxLength={50}
+                                required/>
                             </Grid>}
 
                             {/*Selecciona la opcion Soy turista */}
@@ -501,6 +595,20 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 value={turno.fecha}
                                 style={{boxSizing: "border-box", padding:"0px 10px",background:"rgba(0,0,0,.1)", borderRadius:"5px",border:"none"}}/>
                             </Grid>
+
+                            {tildado && <Grid item lg={4} md={4} sm={12} xs={12} align="center">
+                                <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={checkedLocalidad}
+                                        onChange={metodoLocalidad}
+                                        name="otra_localidad"
+                                        color="primary"
+                                    />
+                                }
+                                label="Ver cupo para otras localidades"
+                                />
+                            </Grid>}
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
                                 {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}

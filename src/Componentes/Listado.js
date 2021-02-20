@@ -117,7 +117,7 @@ function Row({turno, ruta, usuario, cantidadAsistencia}) {
                 </Grid>
                 <Grid item lg={3} md={3} sm={12} xs={12} align="center">
                   <Typography variant="subtitle1" gutterBottom component="div">
-                    {Turno.persona.domicilio?" Situación: Turista":" Localidad: San Bernardo"}
+                    {Turno.persona.domicilio?"Situación: Turista":(Turno.persona.domicilio===false?"Localidad: San Bernardo":"Localidad: "+Turno.persona.domicilio_alojado)}
                   </Typography>
                 </Grid>
                 <Grid item lg={3} md={3} sm={12} xs={12} align="center">
