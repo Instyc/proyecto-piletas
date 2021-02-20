@@ -626,6 +626,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 </FormControl>
                             </Grid>
 
+                            {tildado && <Grid item lg={12} md={12} sm={12} xs={12} align="justify">
+                                <Typography align="center" variant="p2">
+                                    *Si necesitás cambiar algún dato que proporcionaste anteriormente, podés enviar un correo a complejoderpotivosb@gmail.com para modificarlo*
+                                </Typography>
+                            </Grid>}
+
                             <br/>
                             <Typography variant="h4" component="h4" align="center">
                                 Declaración Jurada de Síntomas de COVID-19
