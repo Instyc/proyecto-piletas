@@ -393,7 +393,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     return (
         <div className={classes.fondo}>
-            <ModalComprobante modalDatos={modalDatos} setmodalDatos={setmodalDatos}/>
+            {/*<ModalComprobante modalDatos={modalDatos} setmodalDatos={setmodalDatos}/>*/}
             
             <Paper elevation={3} style={{padding: "10px", background:"lightblue"}}>
                 <form onSubmit={alertaPregunta}>

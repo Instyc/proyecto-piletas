@@ -19,7 +19,7 @@ function App() {
   const ruta = "https://piletas-sb.herokuapp.com";
   //const ruta = "https://8702aae9d9d1.ngrok.io";
   //const ruta = "http://localhost:1337";
-  const mantenimiento = true
+  const mantenimiento = false
   const [copiado, setcopiado] = useState(false)
 
   const [usuario, setusuario] = useState({
@@ -74,7 +74,6 @@ function App() {
               <img src="mantenimiento.png" width="100%" alt=""></img>
             </div>
           </Route>}
-          <Route path={"/pruebaMantenimiento"}><Formulario ruta={ruta}/></Route>
           <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
           <Route path={"/listarDeporte"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<ListadoDeporte usuario={usuario} ruta={ruta}/>}</Route>
