@@ -233,24 +233,24 @@ export default function Listado({ruta,usuario}) {
         axios.get(ruta+'/turnos?_limit=-1&fecha='+e.target.value,
         {headers: {'Authorization': auth}})
         .then(response => {
-            setturnos([])
-            let turnos_ordenados = response.data;
-            // array temporal contiene objetos con posición y valor de ordenamiento
-            var arregloAux = turnos_ordenados.map(function(arreglo, i) {
-              return { index: i, value: arreglo.persona.apellido.toLowerCase() };
-            })
-            // ordenando el array mapeado que contiene los valores reducidos
-            arregloAux.sort(function(a, b) {
-              if (a.value > b.value) {
-                return 1;
-              }
-              if (a.value < b.value) {
-                return -1;
-              }
-              return 0;
-            });
-            // contenedor para el orden resultante
-            var resultado = arregloAux.map(function(arreglo){
+          setturnos([])
+          let turnos_ordenados = response.data;
+          // array temporal contiene objetos con posición y valor de ordenamiento
+          var arregloAux = turnos_ordenados.map(function(arreglo, i) {
+            return { index: i, value: arreglo.persona.apellido.toLowerCase() };
+          })
+          // ordenando el array mapeado que contiene los valores reducidos
+          arregloAux.sort(function(a, b) {
+            if (a.value > b.value) {
+              return 1;
+            }
+            if (a.value < b.value) {
+              return -1;
+            }
+            return 0;
+          });
+          // contenedor para el orden resultante
+          var resultado = arregloAux.map(function(arreglo){
               return turnos_ordenados[arreglo.index];
             });
             setturnos(resultado)

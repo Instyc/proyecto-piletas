@@ -7,6 +7,8 @@ import Estilos from '../Estilos.js';
 import Notificacion from './Notificacion.js'
 import AlertaMensaje from './Alerta.js'
 
+// import Comprobante from './pdf-comprobante'
+// import {PDFDownloadLink} from '@react-pdf/renderer'
 
 //Componente utilizado para crear o modificar publicaciones o solicitudes de servicios
 export default function Inicio({ruta}) {
@@ -109,7 +111,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const [tildado, settildado] = useState(false);
     const [mensaje, setmensaje] = useState("");
     const [tildadoCovid, settildadoCovid] = useState(false);
-    const [disponibles, setdisponibles] = useState(-3);
+    const [disponibles, setdisponibles] = useState(-4);
     const [esperaDisponible, setesperaDisponible] = useState(false);
     const [notificar, setnotificar] = useState(false);
     const [fechaHoy, setfechaHoy] = useState("");
@@ -165,17 +167,22 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         setcargando(false)
         setesperaDisponible(true)
 
-        if (date_.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+fecha_+'&tipo=0')
-            .then(response => {
-                setdisponibles(150-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
+        if (fecha_ === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
             setesperaDisponible(false)
+        }else{
+            if (date_.getUTCDay()!==1){
+                axios.get(ruta+'/turnos/count?fecha='+fecha_+'&tipo=0')
+                .then(response => {
+                    setdisponibles(150-response.data)
+                    setesperaDisponible(false)
+                }).catch(error => {
+                    console.log(error.response)
+                });
+            }else{
+                setdisponibles(-2)//Cuando se selecciona un lunes
+                setesperaDisponible(false)
+            }
         }
     },[])
 
@@ -259,8 +266,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         });
     }
 
-     
-
     async function alertaPregunta(e){
         e.preventDefault();
         setcargandoSolicitar(true)
@@ -339,79 +344,51 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
         //0: San Bernardo, 1: Turista, 2: Otra localidad
         setturista(identificador===1)
         let tipo_ = identificador===2?1:0
-        let _fecha = new Date(turno.fecha)
         setturno({...turno, tipo: tipo_})
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+tipo_)
-            .then(response => {
-                tipo_===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
-            setesperaDisponible(false)
-        }
+        comprobarDisponibles(turno.fecha, tipo_)
     }
 
     function seleccionarFecha(e){
         setturno({...turno, fecha: e.target.value})
         setesperaDisponible(true)
-        let _fecha = new Date(e.target.value)
-        let _tipo = turno.tipo
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+e.target.value+'&tipo='+_tipo)
-            .then(response => {
-                _tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
-            setesperaDisponible(false)
-        }
+        comprobarDisponibles(e.target.value, turno.tipo)
     }
 
     function reservaAlgunaVez(){
         settildado(!tildado)
-        setesperaDisponible(true)
-        let _fecha = new Date(turno.fecha)
+        setesperaDisponible(true)        
         setcheckedLocalidad(turno.tipo===1)
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+turno.tipo)
-            .then(response => {
-                turno.tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
-            setesperaDisponible(false)
-        }
+        comprobarDisponibles(turno.fecha, turno.tipo)
     }
-
+    
     function metodoLocalidad(){
         setcheckedLocalidad(!checkedLocalidad)
         setesperaDisponible(true)
-        let _fecha = new Date(turno.fecha)
         let _tipo = checkedLocalidad?0:1
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/turnos/count?fecha='+turno.fecha+'&tipo='+_tipo)
-            .then(response => {
-                _tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
-            setesperaDisponible(false)
-        }
+        comprobarDisponibles(turno.fecha, _tipo)
     }
     
+    function comprobarDisponibles(fecha, tipo){
+        let _fecha = new Date(fecha)
+        if (fecha === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
+            setesperaDisponible(false)
+        }else{
+            if (_fecha.getUTCDay()!==1){
+                axios.get(ruta+'/turnos/count?fecha='+fecha+'&tipo='+tipo)
+                .then(response => {
+                    tipo===1?setdisponibles(50-response.data):setdisponibles(150-response.data)
+                    setesperaDisponible(false)
+                }).catch(error => {
+                    console.log(error.response)
+                });
+            }else{
+                setdisponibles(-2)//Cuando se selecciona un lunes
+                setesperaDisponible(false)
+            }
+        }
+    }
+
     return (
         <div className={classes.fondo}>
             <Paper elevation={3} style={{padding: "10px", background:"lightblue"}}>
@@ -423,6 +400,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                     Turnos de pileta
                                 </Typography>
                             </Grid>
+
+                            {/* <div>
+                                <PDFDownloadLink document={<Comprobante />} fileName="somename.pdf">
+                                {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
+                                </PDFDownloadLink>
+                            </div> */}
 
                             <Grid item lg={12} md={12} sm={12} xs={12}>
                                 <FormControlLabel
@@ -613,7 +596,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">
                                 {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}
                                 {esperaDisponible && <LinearProgress color="secondary"/>}
-                                <Typography color="secondary"> {disponibles===-1?"0 lugares disponibles":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"":`${disponibles} lugares disponibles`)))} </Typography>
+                                <Typography color="secondary"> {disponibles===-1?"0 lugares disponibles":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"El complejo permancerá cerrado esta fecha. Por favor, seleccione una distinta.":(disponibles===-4?"":`${disponibles} lugares disponibles`))))} </Typography>
                             </Grid>
 
                             <Grid item lg={4} md={4} sm={12} xs={12} align="center">

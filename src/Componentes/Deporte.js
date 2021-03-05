@@ -107,7 +107,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
     const [tildado, settildado] = useState(false);
     const [mensaje, setmensaje] = useState("");
     const [tildadoCovid, settildadoCovid] = useState(false);
-    const [disponibles, setdisponibles] = useState(-3);
+    const [disponibles, setdisponibles] = useState(-4);
     const [esperaDisponible, setesperaDisponible] = useState(false);
     const [notificar, setnotificar] = useState(false);
     const [fechaHoy, setfechaHoy] = useState("");
@@ -174,13 +174,19 @@ function Alerta({funcionAceptar, persona, deporte}) {
         })
         setcargando(false)
         setesperaDisponible(true)
-        axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
-        .then(response => {
-            setdisponibles(2-response.data)
+        
+        if (fecha_ === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
             setesperaDisponible(false)
-        }).catch(error => {
-            console.log(error.response)
-        });
+        }else{
+            axios.get(ruta+'/deportes/count?fecha='+fecha_+'&horario=0'+'&tipo=0')
+            .then(response => {
+                setdisponibles(2-response.data)
+                setesperaDisponible(false)
+            }).catch(error => {
+                console.log(error.response)
+            });
+        }
     },[])
 
     function modificarInput(e){
@@ -238,17 +244,22 @@ function Alerta({funcionAceptar, persona, deporte}) {
         })
         setesperaDisponible(true)
         let _fecha = new Date(deporte.fecha)
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+deporte.horario+'&tipo='+(e.target.value==="Fútbol"?'0':(e.target.value==="Voley"?'1':'2')))
-            .then(response => {
-                setdisponibles(2-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
+        if (deporte.fecha === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
             setesperaDisponible(false)
+        }else{
+            if (_fecha.getUTCDay()!==1){
+                axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+deporte.horario+'&tipo='+(e.target.value==="Fútbol"?'0':(e.target.value==="Voley"?'1':'2')))
+                .then(response => {
+                    setdisponibles(2-response.data)
+                    setesperaDisponible(false)
+                }).catch(error => {
+                    console.log(error.response)
+                });
+            }else{
+                setdisponibles(-2)//Cuando se selecciona un lunes
+                setesperaDisponible(false)
+            }
         }
     }
 
@@ -266,17 +277,22 @@ function Alerta({funcionAceptar, persona, deporte}) {
         })
         setesperaDisponible(true)
         let _fecha = new Date(deporte.fecha)
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+e.target.value+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
-            .then(response => {
-                setdisponibles(2-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
+        if (deporte.fecha === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
             setesperaDisponible(false)
+        }else{
+            if (_fecha.getUTCDay()!==1){
+                axios.get(ruta+'/deportes/count?fecha='+deporte.fecha+'&horario='+e.target.value+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
+                .then(response => {
+                    setdisponibles(2-response.data)
+                    setesperaDisponible(false)
+                }).catch(error => {
+                    console.log(error.response)
+                });
+            }else{
+                setdisponibles(-2)//Cuando se selecciona un lunes
+                setesperaDisponible(false)
+            }
         }
     }
 
@@ -396,17 +412,22 @@ function Alerta({funcionAceptar, persona, deporte}) {
         setdeporte({...deporte, fecha: e.target.value})
         setesperaDisponible(true)
         let _fecha = new Date(e.target.value)
-        if (_fecha.getUTCDay()!==1){
-            axios.get(ruta+'/deportes/count?fecha='+e.target.value+'&horario='+deporte.horario+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
-            .then(response => {
-                setdisponibles(2-response.data)
-                setesperaDisponible(false)
-            }).catch(error => {
-                console.log(error.response)
-            });
-        }else{
-            setdisponibles(-2)//Cuando se selecciona un lunes
+        if (e.target.value === "2021-03-09"){
+            setdisponibles(-3)//Día no hábil
             setesperaDisponible(false)
+        }else{
+            if (_fecha.getUTCDay()!==1){
+                axios.get(ruta+'/deportes/count?fecha='+e.target.value+'&horario='+deporte.horario+'&tipo='+(deporte.tipo==="Fútbol"?'0':(deporte.tipo==="Voley"?'1':'2')))
+                .then(response => {
+                    setdisponibles(2-response.data)
+                    setesperaDisponible(false)
+                }).catch(error => {
+                    console.log(error.response)
+                });
+            }else{
+                setdisponibles(-2)//Cuando se selecciona un lunes
+                setesperaDisponible(false)
+            }
         }
     }
     
@@ -616,7 +637,7 @@ function Alerta({funcionAceptar, persona, deporte}) {
                             <Grid item lg={3} md={3} sm={12} xs={12} align="center">
                                 {esperaDisponible && <Typography align="center" variant="h6">Cargando...</Typography>}
                                 {esperaDisponible && <LinearProgress color="secondary"/>}
-                                <Typography color="secondary"> {disponibles===-1?"":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"":`${disponibles} lugares disponibles`)))} </Typography>
+                                <Typography color="secondary"> {disponibles===-1?"0 lugares disponibles":(disponibles===-2?"Los días lunes no se puede reservar.":(disponibles===1?`${disponibles} lugar disponible`:(disponibles===-3?"El complejo permancerá cerrado esta fecha. Por favor, seleccione una distinta.":(disponibles===-4?"":`${disponibles} lugares disponibles`))))} </Typography>
                             </Grid>
 
                             {deporte.tipo!=='' && <Grid item lg={6} md={6} sm={12} xs={12} align="right">
