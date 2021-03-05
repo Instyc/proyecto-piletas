@@ -7,13 +7,11 @@ import Estilos from '../Estilos.js';
 import Notificacion from './Notificacion.js'
 import AlertaMensaje from './Alerta.js'
 
-// import Comprobante from './pdf-comprobante'
-// import {PDFDownloadLink} from '@react-pdf/renderer'
+import ModalComprobante from './pdf-comprobante'
 
 //Componente utilizado para crear o modificar publicaciones o solicitudes de servicios
 export default function Inicio({ruta}) {
     const [siguiente, setsiguiente] = useState(false);
-    
     return ( 
         siguiente?<Formulario setsiguiente={setsiguiente} ruta={ruta}/>:<Condiciones setsiguiente={setsiguiente}/>
     );
@@ -25,6 +23,7 @@ const Condiciones = ({setsiguiente}) => {
     return (
         <div className={classes.fondo}>
             <Paper elevation={3} style={{padding: "20px", background:"lightblue", maxWidth:"1600px"}} className="Fondo">
+
                 <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
                     <Grid item xs={12}>
                         <Typography variant="h4" component="h1" align="center">
@@ -43,7 +42,7 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada sobre síntomas de COVID-19 al momento de ingresar.</li>
                             <li>Para cancelar una reserva, comunicate al correo complejodeportivosb@gmail.com junto con tus datos y una foto del frente y dorso de tu documento.</li>
                             <li>Tené en cuenta que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
-                            <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo.</li></strong>
+                            <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo. El complejo se reserva el derecho de admisión.</li></strong>
                         <br/></ul>       
                     </Grid>      
                     <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
@@ -118,9 +117,10 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
     const [turista, setturista] = useState(false);
     const [abrirAlerta, setabrirAlerta] = useState(false);
     const [checkedLocalidad, setcheckedLocalidad] = useState(false);
-
     const [cargandoSolicitar, setcargandoSolicitar] = useState(false);
     
+    const [modalDatos, setmodalDatos] = useState(null);
+
     const [msj, setmsj] = useState({descripcion:"",tipo:"success"});
     
 
@@ -314,8 +314,9 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
             if(tildado){
                 let respuesta = await axios.post(ruta+'/turno-pileta-creada',{persona: persona_, turno: turno})
                 setcargandoSolicitar(false)
-                
+
                 if(respuesta.data.tipo==="success"){
+                    setmodalDatos(respuesta?.data.data)
                     setdisponibles(disponibles-1)
                 }
                 
@@ -327,6 +328,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
                 setcargandoSolicitar(false)
                 if(respuesta.data.tipo==="success"){
+                    setmodalDatos(respuesta?.data.data)
                     limpiarVariables();
                     setdisponibles(disponibles-1)
                 }
@@ -391,6 +393,8 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     return (
         <div className={classes.fondo}>
+            <ModalComprobante modalDatos={modalDatos} setmodalDatos={setmodalDatos}/>
+            
             <Paper elevation={3} style={{padding: "10px", background:"lightblue"}}>
                 <form onSubmit={alertaPregunta}>
                     <FormControl color="primary" fullWidth>
@@ -401,11 +405,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 </Typography>
                             </Grid>
 
-                            {/* <div>
-                                <PDFDownloadLink document={<Comprobante />} fileName="somename.pdf">
-                                {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
-                                </PDFDownloadLink>
-                            </div> */}
+                     
 
                             <Grid item lg={12} md={12} sm={12} xs={12}>
                                 <FormControlLabel
@@ -610,7 +610,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                             </Grid>
 
                             {tildado && <Grid item lg={12} md={12} sm={12} xs={12} align="justify">
-                                <Typography align="center" variant="p2">
+                                <Typography align="justify" variant="body1">
                                     *Si necesitás cambiar algún dato que proporcionaste anteriormente, podés enviar un correo a complejoderpotivosb@gmail.com para modificarlo*
                                 </Typography>
                             </Grid>}
