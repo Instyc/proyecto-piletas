@@ -6,6 +6,7 @@ import Alert from '@material-ui/lab/Alert';
 import Estilos from '../Estilos.js';
 import Notificacion from './Notificacion.js'
 import AlertaMensaje from './Alerta.js'
+import {Link} from "react-router-dom";
 
 import ModalComprobante from './pdf-comprobante'
 
@@ -42,10 +43,11 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Si realizás una reserva 72 horas antes de asistir al complejo, deberás realizar una actualización de la declaración jurada sobre síntomas de COVID-19 al momento de ingresar.</li>
                             <li>Para cancelar una reserva, comunicate al correo complejodeportivosb@gmail.com junto con tus datos y una foto del frente y dorso de tu documento.</li>
                             <li>Tené en cuenta que si querés anotar a tu grupo familiar, deberás pedir turno para cada integrante de tu familia.</li>
-                            <strong><li>Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo. El complejo se reserva el derecho de admisión.</li></strong>
+                            <li>Si realizás una reserva y luego no asistís al complejo (sin haber cancelado el turno), <strong style={{backgroundColor:"lightyellow"}}>no vas a poder sacar un nuevo turno por los próximos 5 días.</strong></li>
+                            <strong><li >Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo. El complejo se reserva el derecho de admisión.</li></strong>
                         <br/></ul>       
                     </Grid>      
-                    <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
+                    <Button className={classes.botones} onClick={()=>{window.scrollTo(0, 0); setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
                 </Grid>
             </Paper>
         </div>
@@ -393,7 +395,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
     return (
         <div className={classes.fondo}>
-            {/*<ModalComprobante modalDatos={modalDatos} setmodalDatos={setmodalDatos}/>*/}
+            <ModalComprobante modalDatos={modalDatos} setmodalDatos={setmodalDatos}/>
             
             <Paper elevation={3} style={{padding: "10px", background:"lightblue"}}>
                 <form onSubmit={alertaPregunta}>
@@ -407,7 +409,7 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
 
                      
 
-                            <Grid item lg={12} md={12} sm={12} xs={12}>
+                            <Grid item lg={6} md={6} sm={12}>
                                 <FormControlLabel
                                 control={
                                     <Checkbox
@@ -419,6 +421,12 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                 }
                                 label="Ya he realizado una reserva alguna vez"
                                 />
+                            </Grid>
+
+                            <Grid item lg={6} md={6} sm={12}>
+                                <Link to={"/comprobante"} style={{textDecoration:"none", padding: 0, color:"black"}}>
+                                    <Button>Obtener comprobante de turno</Button>
+                                </Link>
                             </Grid>
 
                             <Grid item lg={2} md={2} sm={12} xs={12}>
@@ -663,7 +671,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                         <AlertaMensaje mensaje={msj} abrir={abrirAlerta} setabrir={setabrirAlerta}/>
                     </FormControl>
                 </form>
-                
             </Paper>
         </div>
     )

@@ -1,11 +1,6 @@
 
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Typography} from '@material-ui/core';
 
 import { PDFDownloadLink, Page, Font, Text, View, Image, Document, StyleSheet } from '@react-pdf/renderer';
 Font.register({ family: 'Akaya Telivigala', src: 'https://fonts.googleapis.com/css2?family=Akaya+Telivigala&display=swap'});
@@ -75,7 +70,7 @@ function Comprobante({modalDatos}){
         <View style={styles.turno}>
           <Text style={styles.sub}>Fecha de emisión del comprobante: <Text style={styles.datos}>{fecha}</Text></Text>
           <Text style={styles.sub}>N° de turno: <Text style={styles.datos}>#{`${modalDatos.id}`}</Text></Text>
-          <Text style={styles.sub}>Fecha: <Text style={styles.datos}>{`${modalDatos.fecha}`}</Text></Text>
+          <Text style={styles.sub}>Fecha del turno: <Text style={styles.datos}>{`${modalDatos.fecha}`}</Text></Text>
           <Text style={styles.sub}>Área: <Text style={styles.datos}>{modalDatos.area===0?"Pileta":modalDatos.area===1?"Camping":"Camping y pileta"}</Text></Text>
         </View>
 
@@ -128,7 +123,7 @@ export default function ModalComprobante({modalDatos, setmodalDatos}) {
         }
     },[modalDatos])
 
-    const handleClose = () => {
+    const cerrar = () => {
         setOpen(false);
         setmodalDatos(null)
     };
@@ -137,18 +132,23 @@ export default function ModalComprobante({modalDatos, setmodalDatos}) {
       <div>
         <Dialog
           open={open}
-          onClose={handleClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"Comprobante de turno"}</DialogTitle>
           <DialogContent>
-            {open && <LinkDescarga modalDatos={modalDatos}/>}
+              <Typography align="justify">
+                Al momento de ingresar al complejo recreativo, deberá presentar <strong>obligatoriamente</strong> el comprobante (formato papel o por medio del celular) junto con su documento.
+              </Typography>
 
-            <DialogContentText id="alert-dialog-description">
-              Let Google help apps determine location. This means sending anonymous location data to
-              Google, even when no apps are running.
-            </DialogContentText>
+            <Grid container direction="row" spacing={3} xs={12} alignItems="center">
+              <Grid item align="center" xs={6}>
+                <Button color="secondary" style={{padding: '0'}} onClick={cerrar}><u>Cerrar</u></Button>
+              </Grid>
+              <Grid item align="center" xs={6}>
+                <Button color="primary" style={{padding: '0'}}>{open && <LinkDescarga modalDatos={modalDatos}/>}</Button>
+              </Grid>
+            </Grid>
           </DialogContent>
         </Dialog>
       </div>

@@ -9,6 +9,8 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Estilos from '../Estilos.js';
 import {Check as Si, Close as No} from '@material-ui/icons/';
 
+import PdfListado from './pdf-listado'
+
 const useRowStyles = makeStyles({
   root: {    '& > *': {
       borderBottom: 'unset',
@@ -310,6 +312,8 @@ export default function Listado({ruta,usuario}) {
           <Typography align="justify" style={{fontWeight:"bold", padding:"10px"}}>
             Declaración Jurada de Síntomas de COVID-19 para personas que hayan solicitado un turno hace más de 72 horas: presione en "X" en el caso de que la persona en cuestión haya renovado su declaración jurada y asegure no poseer síntomas de COVID-19 al momento de asistir al complejo.
           </Typography>
+
+          {turnos.length!==0 && <PdfListado fecha={fechaHoy} turnos={turnos} />}
 
           <Typography align="justify" style={{padding:"10px"}}>
             Cantidad de turnos para el día seleccionado: {turnos.length}

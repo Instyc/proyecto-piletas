@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
-
-import './App.css';
-import {AppBar, Toolbar, Typography, Grid, Button, IconButton} from '@material-ui/core';
+import {HashRouter ,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+//Componentes
 import Formulario from './Componentes/Formulario.js'
 import Deporte from './Componentes/Deporte.js'
 import Listado from './Componentes/Listado.js'
@@ -9,8 +8,12 @@ import ListadoDeporte from './Componentes/ListadoDeporte.js'
 import Sesion from './Componentes/Sesion.js'
 import Nav from './Componentes/Nav.js'
 import AlertaMensaje from './Componentes/Alerta.js'
+import ObtenerComprobante from './Componentes/ObtenerComprobante.js'
+
+//Estilos
+import './App.css';
+import {AppBar, Toolbar, Typography, Grid, Button, IconButton} from '@material-ui/core';
 import Estilos from './Estilos.js'
-import {HashRouter ,BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Copiar from '@material-ui/icons/FileCopy';
 import {Instagram, Facebook} from '@material-ui/icons';
 
@@ -77,6 +80,8 @@ function App() {
           <Route path={"/sesion"}>{usuario.jwt!==""?<Redirect to={"/listar"} />:<Sesion ruta={ruta} setusuario={setusuario}/>}</Route>
           <Route path={"/listar"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<Listado usuario={usuario} ruta={ruta}/>}</Route>
           <Route path={"/listarDeporte"}>{aux && usuario.jwt===""?<Redirect to={"/"} />:<ListadoDeporte usuario={usuario} ruta={ruta}/>}</Route>
+          
+          <Route path={"/comprobante"}>{<ObtenerComprobante ruta={ruta}/>}</Route>
           <Route>
             <div className={classes.fondo2} style={{margin:"auto"}}>
               <img src="404.png" width="100%" alt=""></img>

@@ -42,7 +42,7 @@ const Condiciones = ({setsiguiente}) => {
                     <Grid item xs={12}>
                              
                     </Grid>     
-                    <Button className={classes.botones} onClick={()=>{setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
+                    <Button className={classes.botones} onClick={()=>{window.scrollTo(0, 0); setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
                 </Grid>
             </Paper>
         </div>
