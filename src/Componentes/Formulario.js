@@ -46,8 +46,15 @@ const Condiciones = ({setsiguiente}) => {
                             <li>Si realizás una reserva y luego no asistís al complejo (sin haber cancelado el turno), <strong style={{backgroundColor:"lightyellow"}}>no vas a poder sacar un nuevo turno por los próximos 5 días.</strong></li>
                             <strong><li >Es obligatorio el uso de barbijo y elementos de higiene personal dentro del complejo. El complejo se reserva el derecho de admisión.</li></strong>
                         <br/></ul>       
-                    </Grid>      
-                    <Button className={classes.botones} onClick={()=>{window.scrollTo(0, 0); setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
+                    </Grid>
+                    <Grid  item xs={6}>
+                        <Link to={"/comprobante"} style={{textDecoration:"none", padding: 0, color:"black"}}>
+                            <Button>Obtener comprobante de turno</Button>
+                        </Link>
+                    </Grid>
+                    <Grid  item xs={6}>
+                        <Button className={classes.botones} onClick={()=>{window.scrollTo(0, 0); setsiguiente(true)}} size="large" variant="contained" color="secondary">Siguiente</Button>
+                    </Grid>
                 </Grid>
             </Paper>
         </div>
@@ -406,8 +413,6 @@ const Formulario = ({setsiguiente, ruta, usuario}) =>{
                                     Turnos de pileta
                                 </Typography>
                             </Grid>
-
-                     
 
                             <Grid item lg={6} md={6} sm={12}>
                                 <FormControlLabel
