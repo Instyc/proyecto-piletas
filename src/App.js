@@ -22,7 +22,7 @@ function App() {
   const ruta = "https://piletas-sb.herokuapp.com";
   //const ruta = "https://8702aae9d9d1.ngrok.io";
   //const ruta = "http://localhost:1337";
-  const mantenimiento = false
+  const mantenimiento = true
   const [copiado, setcopiado] = useState(false)
 
   const [usuario, setusuario] = useState({
